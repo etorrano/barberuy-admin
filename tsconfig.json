@@ -2,6 +2,10 @@
   "include": ["src", "src/declaration.d.ts"],
   "type": "module",
   "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "rootDir": "./src",
     "sourceMap": true,
     "noEmitOnError": true,
