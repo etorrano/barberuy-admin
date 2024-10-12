@@ -1,19 +1,13 @@
 {
-  "include": ["src", "src/declaration.d.ts"],
-  "type": "module",
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
   "compilerOptions": {
-    "rootDir": "./src",
-    "sourceMap": true,
-    "noEmitOnError": true,
-    "noEmit": true,
-    "target": "ES6",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "jsx": "react-jsx",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "moduleResolution": "node"
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
