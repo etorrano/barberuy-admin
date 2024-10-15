@@ -39,7 +39,7 @@ export function Sidebar() {
 									: 'translate-x-0 opacity-100'
 							)}
 						>
-							Panel de Administración
+							Administración
 						</h1>
 					</a>
 				</Button>

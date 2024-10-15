@@ -27,7 +27,7 @@ function Menu({ isOpen }: MenuProps) {
           {menuList.map(({ groupLabel, menus }, index) => (
             <li className={cn('w-full', groupLabel ? 'pt-5' : '')} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
-                <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[95px] truncate">
+                <p className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[10rem] truncate">
                   {groupLabel}
                   
                 </p>
@@ -125,7 +125,7 @@ function Menu({ isOpen }: MenuProps) {
                         isOpen === false ? 'opacity-0 hidden' : 'opacity-100'
                       )}
                     >
-                      Sign out
+                      Cerrar Sesión
                     </p>
                   </Button>
                 </TooltipTrigger>

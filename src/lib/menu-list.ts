@@ -34,53 +34,85 @@ export function getMenuList(pathname: string): Group[] {
       menus: [
         {
           href: "/dashboard",
-          label: "Dashboard",
+          label: "Panel",
           icon: LayoutGrid,
           submenus: []
         }
       ]
     },
     {
-      groupLabel: "Contents",
+      groupLabel: "",
       menus: [
         {
-          href: "",
-          label: "Posts",
-          icon: SquarePen,
-          submenus: [
-            {
-              href: "/posts",
-              label: "All Posts"
-            },
-            {
-              href: "/posts/new",
-              label: "New Post"
-            }
-          ]
-        },
-        {
-          href: "/categories",
-          label: "Categories",
-          icon: Bookmark
-        },
-        {
-          href: "/tags",
-          label: "Tags",
-          icon: Tag
+          href: "/dashboard",
+          label: "Agenda",
+          icon: LayoutGrid,
+          submenus: []
         }
       ]
     },
     {
-      groupLabel: "Settings",
+      groupLabel: "Contenido",
+      menus: [
+        {
+          href: "",
+          label: "Punto de Venta",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "/posts",
+              label: "Ver listado"
+            },
+            {
+              href: "/posts/new",
+              label: "Nuevo"
+            }
+          ]
+        },        
+        {
+          href: "",
+          label: "Turno",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "/posts",
+              label: "Ver listado"
+            },
+            {
+              href: "/posts/new",
+              label: "Nuevo"
+            }
+          ]
+        },
+        
+        {
+          href: "",
+          label: "Servicio",
+          icon: SquarePen,
+          submenus: [
+            {
+              href: "/posts",
+              label: "Ver listado"
+            },
+            {
+              href: "/posts/new",
+              label: "Nuevo"
+            }
+          ]
+        },
+      ]
+    },
+    {
+      groupLabel: "Configuración",
       menus: [
         {
           href: "/users",
-          label: "Users",
+          label: "Usuarios",
           icon: Users
         },
         {
           href: "/account",
-          label: "Account",
+          label: "Mi cuenta",
           icon: Settings
         }
       ]

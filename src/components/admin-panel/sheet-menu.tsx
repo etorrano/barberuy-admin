@@ -26,7 +26,7 @@ export function SheetMenu() {
           >
             <a href="/dashboard" className="flex items-center gap-2">
               <PanelsTopLeft className="w-6 h-6 mr-1" />
-              <h1 className="font-bold text-lg">Panel de Administración</h1>
+              <h1 className="font-bold text-lg">Administración</h1>
             </a>
           </Button>
         </SheetHeader>

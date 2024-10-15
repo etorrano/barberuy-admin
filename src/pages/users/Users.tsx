@@ -15,23 +15,17 @@ import CardContainer from "@/components/layout/card-container/card-container";
 export default function UsersPage() {
   return (
     <AdminPanelLayout>
-    <ContentLayout title="Users">
+    <ContentLayout title="Usuarios">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <a href="/">Home</a>
+              <a href="/">Inicio</a>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <a href="/dashboard">Dashboard</a>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Users</BreadcrumbPage>
+            <BreadcrumbPage>Usuarios</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
