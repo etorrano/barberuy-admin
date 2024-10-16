@@ -5,9 +5,10 @@ import { useStore } from "../../hooks/use-store";
 import { Footer } from "./footer";
 import { Sidebar } from "./sidebar";
 import { useSidebarToggle } from "../../hooks/use-sidebar-toggle";
+import { Toaster } from "../ui/toaster";
 
 export default function AdminPanelLayout({
-  children
+  children,
 }: {
   children: React.ReactNode;
 }) {
@@ -17,6 +18,7 @@ export default function AdminPanelLayout({
 
   return (
     <>
+      <Toaster />
       <Sidebar />
       <main
         className={cn(

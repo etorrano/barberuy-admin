@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,30 +19,62 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import { addUser } from "@/api/client";
+import { useToast } from "@/hooks/use-toast";
 
-
-const formSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  rol: z.string(),
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2),
+    email: z.string().email(),
+    password: z.string(),
+    confirmPassword: z.string(),
+    type: z.string(),
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Las contraseñas no coinciden",
+        path: ["confirmPassword"],
+      });
+    }
+  });
 
 const FormUser = () => {
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       email: "",
-      rol: "PERSONAL",
+      type: "2",
+      password: "",
+      confirmPassword: "",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
+    const res = await addUser({ ...values, ...{ type: Number(values.type) } });
+    if (res.status == 201) {
+      form.reset();
+      toast({
+        title: "Completado",
+        description: "El usuario fue creado",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description:
+          "Error al intentar crear el usuario. Por favor, intente nuevamente",
+        variant: "destructive",
+      });
+    }
   }
   return (
     <Form {...form}>
@@ -76,7 +107,33 @@ const FormUser = () => {
         />
         <FormField
           control={form.control}
-          name="rol"
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Contraseña</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirmar contraseña</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Rol</FormLabel>
@@ -88,7 +145,7 @@ const FormUser = () => {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="ADMIN">Administrador</SelectItem>
-                  <SelectItem value="PERSONAL">Empleado</SelectItem>
+                  <SelectItem value="2">Empleado</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
