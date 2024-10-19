@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { addUser } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
+import { UserRole } from "@/models/user.model";
 
 const formSchema = z
   .object({
@@ -29,7 +30,7 @@ const formSchema = z
     email: z.string().email(),
     password: z.string(),
     confirmPassword: z.string(),
-    type: z.string(),
+    role: z.nativeEnum(UserRole),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -49,7 +50,7 @@ const FormUser = () => {
     defaultValues: {
       name: "",
       email: "",
-      type: "2",
+      role: UserRole.STAFF,
       password: "",
       confirmPassword: "",
     },
@@ -60,7 +61,7 @@ const FormUser = () => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
-    const res = await addUser({ ...values, ...{ type: Number(values.type) } });
+    const res = await addUser(values);
     if (res.status == 201) {
       form.reset();
       toast({
@@ -133,7 +134,7 @@ const FormUser = () => {
         />
         <FormField
           control={form.control}
-          name="type"
+          name="role"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Rol</FormLabel>
@@ -145,7 +146,7 @@ const FormUser = () => {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="ADMIN">Administrador</SelectItem>
-                  <SelectItem value="2">Empleado</SelectItem>
+                  <SelectItem value="STAFF">Empleado</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

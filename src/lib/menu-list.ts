@@ -106,9 +106,19 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "Configuración",
       menus: [
         {
-          href: "/users",
+          href: "",
           label: "Usuarios",
-          icon: Users
+          icon: Users,
+          submenus: [
+            {
+              href: "/usuarios",
+              label: "Ver listado"
+            },
+            {
+              href: "/usuarios/nuevo",
+              label: "Nuevo"
+            }
+          ]
         },
         {
           href: "/account",
