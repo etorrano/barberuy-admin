@@ -1,13 +1,14 @@
-import { MenuIcon, PanelsTopLeft } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import  Menu  from "../admin-panel/menu";
+import Menu from "../admin-panel/menu";
 import {
   Sheet,
   SheetHeader,
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import logo from "@/assets/logo.svg";
 
 export function SheetMenu() {
   return (
@@ -18,15 +19,17 @@ export function SheetMenu() {
         </Button>
       </SheetTrigger>
       <SheetContent className="sm:w-72 px-3 h-full flex flex-col" side="left">
-        <SheetHeader>
+        <SheetHeader className="logo-container">
           <Button
             className="flex justify-center items-center pb-2 pt-1"
             variant="link"
             asChild
           >
             <a href="/dashboard" className="flex items-center gap-2">
-              <PanelsTopLeft className="w-6 h-6 mr-1" />
-              <h1 className="font-bold text-lg">Administración</h1>
+              <div className="logo">
+                <img src={logo}></img>
+                <h1 className="font-bold text-lg">Administración</h1>
+              </div>
             </a>
           </Button>
         </SheetHeader>

@@ -11,11 +11,8 @@ import {
 import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import FormUser from "@/components/user/form-user/form-user";
 import CardContainer from "@/components/layout/card-container/card-container";
-import { columns, UsersList } from "@/components/user/users-list/users-list";
-import { useLoaderData } from "react-router-dom";
 
 export default function UsersFormPage() {
-  const data: any = useLoaderData();
   return (
     <AdminPanelLayout>
       <ContentLayout title="Usuarios">
@@ -28,7 +25,13 @@ export default function UsersFormPage() {
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Usuarios</BreadcrumbPage>
+              <BreadcrumbLink asChild>
+                <a href="/usuarios">Usuarios</a>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Nuevo</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>

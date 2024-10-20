@@ -5,7 +5,7 @@ import {
   Bookmark,
   SquarePen,
   LayoutGrid,
-  LucideIcon
+  LucideIcon,
 } from "lucide-react";
 
 export type Submenu = {
@@ -36,9 +36,9 @@ export function getMenuList(pathname: string): Group[] {
           href: "/dashboard",
           label: "Panel",
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
       groupLabel: "",
@@ -47,9 +47,9 @@ export function getMenuList(pathname: string): Group[] {
           href: "/dashboard",
           label: "Agenda",
           icon: LayoutGrid,
-          submenus: []
-        }
-      ]
+          submenus: [],
+        },
+      ],
     },
     {
       groupLabel: "Contenido",
@@ -61,30 +61,30 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/posts",
-              label: "Ver listado"
+              label: "Ver listado",
             },
             {
               href: "/posts/new",
-              label: "Nuevo"
-            }
-          ]
-        },        
+              label: "Nuevo",
+            },
+          ],
+        },
         {
           href: "",
           label: "Turno",
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
-              label: "Ver listado"
+              href: "/turnos",
+              label: "Ver listado",
             },
             {
-              href: "/posts/new",
-              label: "Nuevo"
-            }
-          ]
+              href: "/turnos/nuevo",
+              label: "Nuevo",
+            },
+          ],
         },
-        
+
         {
           href: "",
           label: "Servicio",
@@ -92,15 +92,15 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/posts",
-              label: "Ver listado"
+              label: "Ver listado",
             },
             {
               href: "/posts/new",
-              label: "Nuevo"
-            }
-          ]
+              label: "Nuevo",
+            },
+          ],
         },
-      ]
+      ],
     },
     {
       groupLabel: "Configuración",
@@ -112,20 +112,20 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/usuarios",
-              label: "Ver listado"
+              label: "Ver listado",
             },
             {
               href: "/usuarios/nuevo",
-              label: "Nuevo"
-            }
-          ]
+              label: "Nuevo",
+            },
+          ],
         },
         {
           href: "/account",
           label: "Mi cuenta",
-          icon: Settings
-        }
-      ]
-    }
+          icon: Settings,
+        },
+      ],
+    },
   ];
 }
