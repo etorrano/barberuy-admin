@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.scss";
 import UsersPage from "./pages/users/users.tsx";
 import { getUsers } from "./api/client.ts";
+import UsersFormPage from "./pages/users/users-form.tsx";
 
 const router = createBrowserRouter([
   {
@@ -13,10 +14,10 @@ const router = createBrowserRouter([
       return getUsers();
     },
   },
-  /*  {
+  {
     path: "/usuarios/nuevo",
-    element: <UsersPage />,
-  }, */
+    element: <UsersFormPage />,
+  },
 ]);
 
 createRoot(document.getElementById("root")!).render(
