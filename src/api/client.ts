@@ -1,5 +1,5 @@
 import { CreateUserPayload, User } from "@/models/user.model";
-import { CreateWorkshiftPayload } from "@/models/workshift.model";
+import { CreateWorkshiftPayload, Workshift } from "@/models/workshift.model";
 import axios from "axios";
 
 const API_URL = "http://localhost:3000";
@@ -20,4 +20,8 @@ export const getUsers = (): Promise<User[]> => {
 
 export const addWorkshift = (workshift: CreateWorkshiftPayload) => {
   return axios.post(`${API_URL}/workshifts`, workshift);
+};
+
+export const getWorkshifts = (): Promise<Workshift[]> => {
+  return axios.get(`${API_URL}/workshifts`);
 };

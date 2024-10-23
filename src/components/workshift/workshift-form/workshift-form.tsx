@@ -13,16 +13,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { addWorkshift } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
 import { Days } from "@/models/workshift.model";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useState } from "react";
+
+export const daysOptions = [
+  { value: Days.MONDAY, label: "Lunes" },
+  { value: Days.TUESDAY, label: "Martes" },
+  { value: Days.WEDNESDAY, label: "Miércoles" },
+  { value: Days.THURSDAY, label: "Jueves" },
+  { value: Days.FRIDAY, label: "Viernes" },
+  { value: Days.SATURDAY, label: "Sábado" },
+  { value: Days.SUNDAY, label: "Domingo" },
+];
 
 const formSchema = z.object({
   days: z.array(z.nativeEnum(Days)),
@@ -32,13 +37,20 @@ const formSchema = z.object({
 
 const WorkshiftForm = () => {
   const { toast } = useToast();
+  const [selectedDays, setSelectedDays] = useState<string[]>([
+    Days.MONDAY,
+    Days.TUESDAY,
+    Days.WEDNESDAY,
+    Days.THURSDAY,
+    Days.FRIDAY,
+  ]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      days: [Days.MONDAY],
-      startTime: "",
-      endTime: "",
+      days: selectedDays as Days[],
+      startTime: "09:00",
+      endTime: "18:00",
     },
   });
 
@@ -73,7 +85,14 @@ const WorkshiftForm = () => {
             <FormItem>
               <FormLabel>Seleccionar días</FormLabel>
               <FormControl>
-                <Input placeholder="Ej: Alberto Machado" {...field} />
+                <MultiSelect
+                  options={daysOptions}
+                  onValueChange={setSelectedDays}
+                  defaultValue={selectedDays}
+                  placeholder="Seleccionar días"
+                  variant="inverted"
+                  maxCount={7}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,7 +104,7 @@ const WorkshiftForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Horario de Inicio</FormLabel>
-              <FormControl>
+              <FormControl className="w-20">
                 <Input aria-label="Time" type="time" {...field} />
               </FormControl>
               <FormMessage />
@@ -98,7 +117,7 @@ const WorkshiftForm = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Horario de Finalización</FormLabel>
-              <FormControl>
+              <FormControl className="w-20">
                 <Input aria-label="Time" type="time" {...field} />
               </FormControl>
               <FormMessage />

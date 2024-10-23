@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getUsers } from "@/api/client";
+import { format } from "date-fns/format";
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -35,10 +36,14 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "createdAt",
     header: "Fecha de Creación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
   },
   {
     accessorKey: "updatedAt",
     header: "Fecha de Modificación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
   },
 ];
 
