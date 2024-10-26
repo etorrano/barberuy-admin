@@ -11,12 +11,46 @@ import {
 import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import CardContainer from "@/components/layout/card-container/card-container";
 import { useLoaderData } from "react-router-dom";
-import {
-  columns,
-  WorkshiftsList,
-} from "@/components/workshift/workshifts-list/workshifts-list";
+import { format } from "date-fns";
+import { Days, Workshift } from "@/models/workshift.model";
+import { ColumnDef } from "@tanstack/react-table";
 import { daysOptions } from "@/components/workshift/workshift-form/workshift-form";
-import { Workshift } from "@/models/workshift.model";
+import { DataTable } from "@/components/ui/data-table";
+
+export const columns: ColumnDef<Workshift>[] = [
+  {
+    accessorKey: "days",
+    header: "Días",
+    cell: ({ getValue }) => {
+      const days = getValue() as Days[];
+      return days.map(
+        (day: string, index) =>
+          daysOptions.find((opt) => opt.value === day)?.label +
+            (index !== days.length - 1 ? ", " : "") || day
+      );
+    },
+  },
+  {
+    accessorKey: "startTime",
+    header: "Hora de Inicio",
+  },
+  {
+    accessorKey: "endTime",
+    header: "Hora de finalización",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Fecha de Creación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Fecha de Modificación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
+  },
+];
 
 export default function WorkshiftsPage() {
   const data: any = useLoaderData();
@@ -38,7 +72,7 @@ export default function WorkshiftsPage() {
         </Breadcrumb>
         <CardContainer>
           <div className="container mx-auto py-10">
-            <WorkshiftsList columns={columns} data={data.data} />
+            <DataTable columns={columns} data={data.data} />
           </div>
         </CardContainer>
       </ContentLayout>

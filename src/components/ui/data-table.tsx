@@ -1,7 +1,5 @@
 "use client";
 
-import { User, UserRole } from "@/models/user.model";
-
 import {
   ColumnDef,
   flexRender,
@@ -17,42 +15,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUsers } from "@/api/client";
 import { format } from "date-fns/format";
-
-export const columns: ColumnDef<User>[] = [
-  {
-    accessorKey: "name",
-    header: "Nombre",
-  },
-  {
-    accessorKey: "email",
-    header: "Correo Electrónico",
-  },
-  {
-    accessorKey: "role",
-    header: "Rol",
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Fecha de Creación",
-    cell: ({ getValue }) =>
-      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
-  },
-  {
-    accessorKey: "updatedAt",
-    header: "Fecha de Modificación",
-    cell: ({ getValue }) =>
-      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
-  },
-];
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function UsersList<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -109,3 +79,23 @@ export function UsersList<TData, TValue>({
     </div>
   );
 }
+
+export type CommonColumns = {
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const commonColumns: ColumnDef<any>[] = [
+  {
+    accessorKey: "createdAt",
+    header: "Fecha de Creación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Fecha de Modificación",
+    cell: ({ getValue }) =>
+      format(new Date(getValue() as number), "dd/MM/yyyy HH:mm:ss"),
+  },
+];

@@ -14,6 +14,10 @@ export const addUser = (user: CreateUserPayload) => {
   return axios.post(`${API_URL}/auth/register`, user);
 };
 
+export const editUser = (id: string | undefined, user: CreateUserPayload) => {
+  return axios.patch(`${API_URL}/auth/${id}`, user);
+};
+
 export const getUsers = (): Promise<User[]> => {
   return axios.get(`${API_URL}/auth`);
 };

@@ -20,59 +20,73 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addUser } from "@/api/client";
+import { addUser, editUser } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { UserRole } from "@/models/user.model";
+import { User, UserRole } from "@/models/user.model";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const formSchema = z
-  .object({
-    name: z.string().min(2),
-    email: z.string().email(),
-    password: z.string(),
-    confirmPassword: z.string(),
-    role: z.nativeEnum(UserRole),
-  })
-  .superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Las contraseñas no coinciden",
-        path: ["confirmPassword"],
-      });
-    }
-  });
-
-const FormUser = () => {
+const FormUser = (props: { user?: User; updateUser?: any }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isEditForm, setIsEditForm] = useState<boolean>(!!props.user);
+
+  const formSchema = z
+    .object({
+      name: z.string().min(2),
+      email: z.string().email(),
+      password: isEditForm ? z.string().optional() : z.string(),
+      confirmPassword: isEditForm ? z.string().optional() : z.string(),
+      role: z.nativeEnum(UserRole),
+    })
+    .superRefine(({ confirmPassword, password }, ctx) => {
+      if (confirmPassword !== password) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Las contraseñas no coinciden",
+          path: ["confirmPassword"],
+        });
+      }
+    });
+
+  const defaultValues = isEditForm
+    ? props.user
+    : {
+        name: "",
+        email: "",
+        role: UserRole.STAFF,
+        password: "",
+        confirmPassword: "",
+      };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      role: UserRole.STAFF,
-      password: "",
-      confirmPassword: "",
-    },
+    defaultValues,
   });
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    const res = await addUser(values);
-    if (res.status == 201) {
+    let res;
+    let successStatus = 201;
+    if (isEditForm) {
+      successStatus = 200;
+      res = await editUser(props.user?.id, values);
+    } else {
+      res = await addUser(values);
+    }
+    if (res.status === successStatus) {
       form.reset();
       toast({
         title: "Completado",
-        description: "El usuario fue creado",
+        description: "El usuario fue " + isEditForm ? "editado" : "creado",
       });
+      if (isEditForm) props.updateUser(values);
     } else {
       toast({
         title: "Error",
         description:
-          "Error al intentar crear el usuario. Por favor, intente nuevamente",
+          "Error al intentar " + isEditForm
+            ? "editar"
+            : "crear" + " el usuario. Por favor, intente nuevamente",
         variant: "destructive",
       });
     }

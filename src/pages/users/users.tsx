@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
   Breadcrumb,
@@ -10,11 +10,97 @@ import {
 } from "@/components/ui/breadcrumb";
 import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import CardContainer from "@/components/layout/card-container/card-container";
-import { columns, UsersList } from "@/components/user/users-list/users-list";
 import { useLoaderData } from "react-router-dom";
+import { commonColumns, DataTable } from "@/components/ui/data-table";
+import { ColumnDef } from "@tanstack/react-table";
+import { User, UserRole } from "@/models/user.model";
+import { DataTableActions } from "@/components/ui/data-table-actions";
+import FormUser from "@/components/user/form-user/form-user";
+import { ArrowLeft } from "lucide-react";
 
 export default function UsersPage() {
   const data: any = useLoaderData();
+  const [displayTable, setDisplayTable] = useState(true);
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    setUsers(data.data);
+  }, [data]);
+
+  const handleEditUser = (data: User, rowIndex: number) => {
+    setUser(data);
+    setDisplayTable(false);
+    setEditingRowIndex(rowIndex);
+    console.log("editing user: ", user);
+  };
+
+  const handleDeleteUser = (data: User, rowIndex: number) => {
+    console.log("deleting user: ", data);
+  };
+
+  const handleUpdateUser = (updatedData: User) => {
+    if (editingRowIndex !== null) {
+      const updatedUsers = [...users];
+      updatedUsers[editingRowIndex] = Object.assign(
+        updatedUsers[editingRowIndex],
+        {
+          name: updatedData.name,
+          email: updatedData.email,
+          role: updatedData.role,
+          updatedAt: Date.now(),
+        }
+      );
+      setUsers(updatedUsers);
+    }
+    setDisplayTable(true);
+  };
+
+  const columns: ColumnDef<User>[] = [
+    ...([
+      {
+        accessorKey: "name",
+        header: "Nombre",
+      },
+      {
+        accessorKey: "email",
+        header: "Correo Electrónico",
+      },
+      {
+        accessorKey: "role",
+        header: "Rol",
+        cell: ({ getValue }) => {
+          const role = getValue() as UserRole;
+          switch (role) {
+            case UserRole.SUPERADMIN:
+              return "Administrador de BarberUY";
+            case UserRole.ADMIN:
+              return "Administrador";
+            case UserRole.CLIENT:
+              return "Cliente";
+            case UserRole.STAFF:
+              return "Empleado";
+          }
+        },
+      },
+    ] as ColumnDef<User>[]),
+    ...commonColumns,
+    ...([
+      {
+        id: "actions",
+        cell: ({ row }) => {
+          return (
+            <DataTableActions
+              onEdit={() => handleEditUser(row.original, row.index)}
+              onDelete={() => handleDeleteUser(row.original, row.index)}
+            />
+          );
+        },
+      },
+    ] as ColumnDef<any>[]),
+  ] as ColumnDef<User>[];
+
   return (
     <AdminPanelLayout>
       <ContentLayout title="Usuarios">
@@ -32,9 +118,23 @@ export default function UsersPage() {
           </BreadcrumbList>
         </Breadcrumb>
         <CardContainer>
-          <div className="container mx-auto py-10">
-            <UsersList columns={columns} data={data.data} />
-          </div>
+          {displayTable ? (
+            <div className="container mx-auto py-10">
+              <DataTable columns={columns} data={users} />
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-4">
+                <ArrowLeft
+                  className="cursor-pointer"
+                  onClick={() => setDisplayTable(true)}
+                />
+                <span>Volver al listado</span>
+              </div>
+              <br />
+              <FormUser user={user} updateUser={handleUpdateUser} />
+            </div>
+          )}
         </CardContainer>
       </ContentLayout>
     </AdminPanelLayout>
