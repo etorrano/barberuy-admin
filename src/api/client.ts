@@ -18,6 +18,10 @@ export const editUser = (id: string | undefined, user: CreateUserPayload) => {
   return axios.patch(`${API_URL}/auth/${id}`, user);
 };
 
+export const deleteUser = (id: string | undefined) => {
+  return axios.delete(`${API_URL}/auth/${id}`);
+};
+
 export const getUsers = (): Promise<User[]> => {
   return axios.get(`${API_URL}/auth`);
 };

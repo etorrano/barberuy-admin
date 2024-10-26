@@ -24,11 +24,9 @@ import { addUser, editUser } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
 import { User, UserRole } from "@/models/user.model";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const FormUser = (props: { user?: User; updateUser?: any }) => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.user);
 
   const formSchema = z

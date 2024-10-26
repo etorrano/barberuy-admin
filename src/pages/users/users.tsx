@@ -17,9 +17,12 @@ import { User, UserRole } from "@/models/user.model";
 import { DataTableActions } from "@/components/ui/data-table-actions";
 import FormUser from "@/components/user/form-user/form-user";
 import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { deleteUser } from "@/api/client";
 
 export default function UsersPage() {
   const data: any = useLoaderData();
+  const { toast } = useToast();
   const [displayTable, setDisplayTable] = useState(true);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
@@ -33,11 +36,27 @@ export default function UsersPage() {
     setUser(data);
     setDisplayTable(false);
     setEditingRowIndex(rowIndex);
-    console.log("editing user: ", user);
   };
 
-  const handleDeleteUser = (data: User, rowIndex: number) => {
-    console.log("deleting user: ", data);
+  const handleDeleteUser = async (id: string, rowIndex: number) => {
+    const res = await deleteUser(id);
+    if (res.status === 200) {
+      toast({
+        title: "Completado",
+        description: "El usuario fue eliminado",
+      });
+      if (editingRowIndex) {
+        const updatedUsers = [...users].splice(editingRowIndex);
+        setUsers(updatedUsers);
+      }
+    } else {
+      toast({
+        title: "Error",
+        description:
+          "Error al intentar eliminar el usuario. Por favor, intente nuevamente",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdateUser = (updatedData: User) => {
@@ -93,7 +112,7 @@ export default function UsersPage() {
           return (
             <DataTableActions
               onEdit={() => handleEditUser(row.original, row.index)}
-              onDelete={() => handleDeleteUser(row.original, row.index)}
+              onDelete={() => handleDeleteUser(row.original.id, row.index)}
             />
           );
         },
