@@ -30,6 +30,17 @@ export const addWorkshift = (workshift: CreateWorkshiftPayload) => {
   return axios.post(`${API_URL}/workshifts`, workshift);
 };
 
+export const editWorkshift = (
+  id: string | undefined,
+  workshift: CreateWorkshiftPayload
+) => {
+  return axios.patch(`${API_URL}/workshifts/${id}`, workshift);
+};
+
 export const getWorkshifts = (): Promise<Workshift[]> => {
   return axios.get(`${API_URL}/workshifts`);
+};
+
+export const deleteWorkshift = (id: string | undefined) => {
+  return axios.delete(`${API_URL}/auth/${id}`);
 };

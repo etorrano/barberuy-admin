@@ -62,31 +62,34 @@ const FormUser = (props: { user?: User; updateUser?: any }) => {
     defaultValues,
   });
 
+  const handleUserError = () => {
+    toast({
+      title: "Error",
+      description: `Error al intentar ${
+        isEditForm ? "editar" : "crear"
+      } el usuario. Por favor, intente nuevamente`,
+      variant: "destructive",
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    let res;
+    let res: any;
     let successStatus = 201;
     if (isEditForm) {
       successStatus = 200;
-      res = await editUser(props.user?.id, values);
+      res = await editUser(props.user?.id, values).catch(() =>
+        handleUserError()
+      );
     } else {
-      res = await addUser(values);
+      res = await addUser(values).catch(() => handleUserError());
     }
     if (res.status === successStatus) {
       form.reset();
       toast({
         title: "Completado",
-        description: "El usuario fue " + isEditForm ? "editado" : "creado",
+        description: `El usuario fue ${isEditForm ? "editado" : "creado"}`,
       });
       if (isEditForm) props.updateUser(values);
-    } else {
-      toast({
-        title: "Error",
-        description:
-          "Error al intentar " + isEditForm
-            ? "editar"
-            : "crear" + " el usuario. Por favor, intente nuevamente",
-        variant: "destructive",
-      });
     }
   }
   return (

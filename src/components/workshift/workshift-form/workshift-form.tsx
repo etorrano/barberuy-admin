@@ -13,9 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import { addWorkshift } from "@/api/client";
+import { addWorkshift, editWorkshift } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { Days } from "@/models/workshift.model";
+import { Days, Workshift } from "@/models/workshift.model";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useState } from "react";
 
@@ -35,8 +35,13 @@ const formSchema = z.object({
   endTime: z.string(),
 });
 
-const WorkshiftForm = () => {
+const WorkshiftForm = (props: {
+  workshift?: Workshift;
+  updateWorkshift?: any;
+}) => {
   const { toast } = useToast();
+  const [isEditForm, setIsEditForm] = useState<boolean>(!!props.workshift);
+
   const [selectedDays, setSelectedDays] = useState<string[]>([
     Days.MONDAY,
     Days.TUESDAY,
@@ -45,34 +50,47 @@ const WorkshiftForm = () => {
     Days.FRIDAY,
   ]);
 
+  const defaultValues = isEditForm
+    ? props.workshift
+    : {
+        days: selectedDays as Days[],
+        startTime: "09:00",
+        endTime: "18:00",
+      };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      days: selectedDays as Days[],
-      startTime: "09:00",
-      endTime: "18:00",
-    },
+    defaultValues,
   });
 
-  // 2. Define a submit handler.
+  const handleWorkshiftError = () => {
+    toast({
+      title: "Error",
+      description: `Error al intentar ${
+        isEditForm ? "editar" : "crear"
+      } el turno. Por favor, intente nuevamente`,
+      variant: "destructive",
+    });
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    const res = await addWorkshift(values);
-    if (res.status == 201) {
+    let res: any;
+    let successStatus = 201;
+    if (isEditForm) {
+      successStatus = 200;
+      res = await editWorkshift(props.workshift?.id, values).catch(() =>
+        handleWorkshiftError()
+      );
+    } else {
+      res = await addWorkshift(values).catch(() => handleWorkshiftError());
+    }
+    if (res.status === successStatus) {
       form.reset();
       toast({
         title: "Completado",
-        description: "El turno fue creado",
+        description: `El turno fue ${isEditForm ? "editado" : "creado"}`,
       });
-    } else {
-      toast({
-        title: "Error",
-        description:
-          "Error al intentar crear el turno. Por favor, intente nuevamente",
-        variant: "destructive",
-      });
+      if (isEditForm) props.updateWorkshift(values);
     }
   }
   return (
@@ -92,6 +110,7 @@ const WorkshiftForm = () => {
                   placeholder="Seleccionar días"
                   variant="inverted"
                   maxCount={7}
+                  {...field}
                 />
               </FormControl>
               <FormMessage />

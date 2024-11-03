@@ -45,8 +45,9 @@ export default function UsersPage() {
         title: "Completado",
         description: "El usuario fue eliminado",
       });
-      if (editingRowIndex) {
-        const updatedUsers = [...users].splice(editingRowIndex);
+      if (rowIndex !== undefined) {
+        const updatedUsers = [...users];
+        updatedUsers.splice(rowIndex, 1);
         setUsers(updatedUsers);
       }
     } else {
