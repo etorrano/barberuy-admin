@@ -9,8 +9,8 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import CardContainer from "@/components/layout/card-container/card-container";
-import WorkshiftForm from "@/components/workshift/workshift-form/workshift-form";
 import { Link } from "react-router-dom";
+import SalesPointForm from "@/components/salespoint/salespoint-form/salespoint-form";
 
 export default function SalesPointFormPage() {
   return (
@@ -25,7 +25,7 @@ export default function SalesPointFormPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/turnos">Turnos</Link>
+              <Link to="/puntos">Puntos de Venta</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -35,7 +35,7 @@ export default function SalesPointFormPage() {
         </BreadcrumbList>
       </Breadcrumb>
       <CardContainer>
-        <WorkshiftForm />
+        <SalesPointForm />
       </CardContainer>
     </ContentLayout>
   );

@@ -8,10 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import CardContainer from "@/components/layout/card-container/card-container";
-import { useLoaderData } from "react-router-dom";
-import { format } from "date-fns";
+import { Link, useLoaderData } from "react-router-dom";
 import { Days, Workshift } from "@/models/workshift.model";
 import { ColumnDef } from "@tanstack/react-table";
 import WorkshiftForm, {
@@ -95,12 +93,12 @@ export default function WorkshiftsPage() {
         },
       },
       {
-        accessorKey: "name",
-        header: "Nombre",
+        accessorKey: "startTime",
+        header: "Hora de Inicio",
       },
       {
-        accessorKey: "email",
-        header: "Correo Electrónico",
+        accessorKey: "endTime",
+        header: "Hora de Finalización",
       },
     ] as ColumnDef<Workshift>[]),
     ...commonColumns,
@@ -120,44 +118,42 @@ export default function WorkshiftsPage() {
   ] as ColumnDef<Workshift>[];
 
   return (
-    <AdminPanelLayout>
-      <ContentLayout title="Turnos">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <a href="/">Inicio</a>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Turnos</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <CardContainer>
-          {displayTable ? (
-            <div className="container mx-auto py-10">
-              <DataTable columns={columns} data={workshifts} />
-            </div>
-          ) : (
-            <div>
-              <div className="flex items-center gap-4">
-                <ArrowLeft
-                  className="cursor-pointer"
-                  onClick={() => setDisplayTable(true)}
-                />
-                <span>Volver al listado</span>
-              </div>
-              <br />
-              <WorkshiftForm
-                workshift={workshift}
-                updateWorkshift={handleUpdateWorkshift}
+    <ContentLayout title="Turnos">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Inicio</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Turnos</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <CardContainer>
+        {displayTable ? (
+          <div className="container mx-auto py-10">
+            <DataTable columns={columns} data={workshifts} />
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center gap-4">
+              <ArrowLeft
+                className="cursor-pointer"
+                onClick={() => setDisplayTable(true)}
               />
+              <span>Volver al listado</span>
             </div>
-          )}
-        </CardContainer>
-      </ContentLayout>
-    </AdminPanelLayout>
+            <br />
+            <WorkshiftForm
+              workshift={workshift}
+              updateWorkshift={handleUpdateWorkshift}
+            />
+          </div>
+        )}
+      </CardContainer>
+    </ContentLayout>
   );
 }

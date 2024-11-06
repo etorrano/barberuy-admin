@@ -1,8 +1,8 @@
-import "./App.scss";
-import FormUser from "./components/user/form-user/form-user";
+import React from "react";
+import AdminPanelLayout from "./components/admin-panel/admin-panel-layout";
+import { Outlet } from "react-router-dom";
 
-const App = () => {
-  return <FormUser></FormUser>;
-};
-
-export default App;
+export default function App() {
+  return (
+  );
+}

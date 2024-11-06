@@ -1,3 +1,4 @@
+import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
 import { CreateUserPayload, User } from "@/models/user.model";
 import { CreateWorkshiftPayload, Workshift } from "@/models/workshift.model";
 import axios from "axios";
@@ -42,5 +43,24 @@ export const getWorkshifts = (): Promise<Workshift[]> => {
 };
 
 export const deleteWorkshift = (id: string | undefined) => {
-  return axios.delete(`${API_URL}/auth/${id}`);
+  return axios.delete(`${API_URL}/workshifts/${id}`);
+};
+
+export const addSalesPoint = (salespoint: CreateSalesPointPayload) => {
+  return axios.post(`${API_URL}/salespoints`, salespoint);
+};
+
+export const editSalesPoint = (
+  id: string | undefined,
+  salespoint: CreateSalesPointPayload
+) => {
+  return axios.patch(`${API_URL}/salespoints/${id}`, salespoint);
+};
+
+export const getSalesPoints = (): Promise<SalesPoint[]> => {
+  return axios.get(`${API_URL}/salespoints`);
+};
+
+export const deleteSalesPoint = (id: string | undefined) => {
+  return axios.delete(`${API_URL}/salespoints/${id}`);
 };

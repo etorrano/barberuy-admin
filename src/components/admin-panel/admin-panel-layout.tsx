@@ -6,12 +6,9 @@ import { Footer } from "./footer";
 import { Sidebar } from "./sidebar";
 import { useSidebarToggle } from "../../hooks/use-sidebar-toggle";
 import { Toaster } from "../ui/toaster";
+import { Outlet } from "react-router-dom";
 
-export default function AdminPanelLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminPanelLayout() {
   const sidebar = useStore(useSidebarToggle, (state) => state);
 
   if (!sidebar) return null;
@@ -26,7 +23,7 @@ export default function AdminPanelLayout({
           sidebar.isOpen === false ? "lg:ml-[91px]" : "lg:ml-[18rem]"
         )}
       >
-        {children}
+        <Outlet />
       </main>
       <footer
         className={cn(

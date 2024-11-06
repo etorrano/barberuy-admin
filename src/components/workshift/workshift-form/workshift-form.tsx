@@ -42,13 +42,15 @@ const WorkshiftForm = (props: {
   const { toast } = useToast();
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.workshift);
 
-  const [selectedDays, setSelectedDays] = useState<string[]>([
-    Days.MONDAY,
-    Days.TUESDAY,
-    Days.WEDNESDAY,
-    Days.THURSDAY,
-    Days.FRIDAY,
-  ]);
+  const [selectedDays, setSelectedDays] = useState<Days[]>(
+    props?.workshift?.days || [
+      Days.MONDAY,
+      Days.TUESDAY,
+      Days.WEDNESDAY,
+      Days.THURSDAY,
+      Days.FRIDAY,
+    ]
+  );
 
   const defaultValues = isEditForm
     ? props.workshift
@@ -76,6 +78,8 @@ const WorkshiftForm = (props: {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     let res: any;
     let successStatus = 201;
+    values = { ...values, ...{ days: selectedDays } };
+
     if (isEditForm) {
       successStatus = 200;
       res = await editWorkshift(props.workshift?.id, values).catch(() =>

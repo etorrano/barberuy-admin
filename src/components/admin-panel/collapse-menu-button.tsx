@@ -8,13 +8,13 @@ import { DropdownMenuArrow } from "@radix-ui/react-dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger
+  CollapsibleTrigger,
 } from "../ui/collapsible";
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-  TooltipProvider
+  TooltipProvider,
 } from "../ui/tooltip";
 import {
   DropdownMenu,
@@ -22,9 +22,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuSeparator
+  DropdownMenuSeparator,
 } from "../ui/dropdown-menu";
 import { Submenu } from "@/lib/menu-list";
+import { Link } from "react-router-dom";
 
 interface CollapseMenuButtonProps {
   icon: LucideIcon;
@@ -39,7 +40,7 @@ export function CollapseMenuButton({
   label,
   active,
   submenus,
-  isOpen
+  isOpen,
 }: CollapseMenuButtonProps) {
   const isSubmenuActive = submenus?.some((submenu) => submenu.active);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(!!isSubmenuActive);
@@ -98,7 +99,7 @@ export function CollapseMenuButton({
             className="w-full justify-start h-10 mb-1"
             asChild
           >
-            <a href={href}>
+            <Link to={href}>
               <span className="mr-4 ml-2">
                 <Dot size={18} />
               </span>
@@ -112,7 +113,7 @@ export function CollapseMenuButton({
               >
                 {label}
               </p>
-            </a>
+            </Link>
           </Button>
         ))}
       </CollapsibleContent>
@@ -157,9 +158,9 @@ export function CollapseMenuButton({
         <DropdownMenuSeparator />
         {submenus?.map(({ href, label }, index) => (
           <DropdownMenuItem key={index} asChild>
-            <a className="cursor-pointer" href={href}>
+            <Link className="cursor-pointer" to={href}>
               <p className="max-w-[180px] truncate">{label}</p>
-            </a>
+            </Link>
           </DropdownMenuItem>
         ))}
         <DropdownMenuArrow className="fill-border" />

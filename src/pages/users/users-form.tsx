@@ -8,37 +8,35 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import FormUser from "@/components/user/form-user/form-user";
 import CardContainer from "@/components/layout/card-container/card-container";
+import { Link } from "react-router-dom";
 
 export default function UsersFormPage() {
   return (
-    <AdminPanelLayout>
-      <ContentLayout title="Usuarios">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <a href="/">Inicio</a>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <a href="/usuarios">Usuarios</a>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Nuevo</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <CardContainer>
-          <FormUser />
-        </CardContainer>
-      </ContentLayout>
-    </AdminPanelLayout>
+    <ContentLayout title="Usuarios">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Inicio</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/usuarios">Usuarios</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Nuevo</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <CardContainer>
+        <FormUser />
+      </CardContainer>
+    </ContentLayout>
   );
 }

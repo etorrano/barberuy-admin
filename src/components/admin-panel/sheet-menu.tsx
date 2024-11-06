@@ -9,6 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import logo from "@/assets/logo.svg";
+import { Link } from "react-router-dom";
 
 export function SheetMenu() {
   return (
@@ -25,12 +26,12 @@ export function SheetMenu() {
             variant="link"
             asChild
           >
-            <a href="/dashboard" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <div className="logo">
                 <img src={logo}></img>
                 <h1 className="font-bold text-lg">Administración</h1>
               </div>
-            </a>
+            </Link>
           </Button>
         </SheetHeader>
         <Menu isOpen />

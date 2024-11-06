@@ -60,11 +60,11 @@ export function getMenuList(pathname: string): Group[] {
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
+              href: "/puntos",
               label: "Ver listado",
             },
             {
-              href: "/posts/new",
+              href: "/puntos/nuevo",
               label: "Nuevo",
             },
           ],

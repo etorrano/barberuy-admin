@@ -5,6 +5,7 @@ import Menu from "../admin-panel/menu";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
 import { SidebarToggle } from "@/components/admin-panel/sidebar-toggle";
 import logo from "@/assets/logo.svg";
+import { Link } from "react-router-dom";
 
 export function Sidebar() {
   const sidebar = useStore(useSidebarToggle, (state) => state);
@@ -29,7 +30,7 @@ export function Sidebar() {
           asChild
         >
           <div className="sidebar-logo-container">
-            <a href="/dashboard" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <div className="logo">
                 <img src={logo}></img>
                 <h1
@@ -43,7 +44,7 @@ export function Sidebar() {
                   Administración
                 </h1>
               </div>
-            </a>
+            </Link>
           </div>
         </Button>
         <Menu isOpen={sidebar?.isOpen} />

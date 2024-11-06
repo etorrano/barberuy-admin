@@ -10,97 +10,98 @@ import {
 } from "@/components/ui/breadcrumb";
 import CardContainer from "@/components/layout/card-container/card-container";
 import { Link, useLoaderData } from "react-router-dom";
-import { Days, Workshift } from "@/models/workshift.model";
 import { ColumnDef } from "@tanstack/react-table";
-import WorkshiftForm, {
-  daysOptions,
-} from "@/components/workshift/workshift-form/workshift-form";
 import { commonColumns, DataTable } from "@/components/ui/data-table";
 import { useToast } from "@/hooks/use-toast";
 import { DataTableActions } from "@/components/ui/data-table-actions";
-import { deleteWorkshift } from "@/api/client";
 import { ArrowLeft } from "lucide-react";
+import SalesPointForm from "@/components/salespoint/salespoint-form/salespoint-form";
+import { SalesPoint } from "@/models/salespoint.model";
+import { deleteSalesPoint } from "@/api/client";
 
 export default function SalesPointPage() {
   const data: any = useLoaderData();
   const { toast } = useToast();
   const [displayTable, setDisplayTable] = useState(true);
-  const [workshift, setWorkshift] = useState<Workshift | undefined>(undefined);
+  const [salespoint, setSalesPoint] = useState<SalesPoint | undefined>(
+    undefined
+  );
   const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
-  const [workshifts, setWorkshifts] = useState<Workshift[]>([]);
+  const [salespoints, setSalesPoints] = useState<SalesPoint[]>([]);
 
   useEffect(() => {
-    setWorkshifts(data.data);
+    setSalesPoints(data?.data);
   }, [data]);
 
-  const handleEditWorkshift = (data: Workshift, rowIndex: number) => {
-    setWorkshift(data);
+  const handleEditSalesPoint = (data: SalesPoint, rowIndex: number) => {
+    setSalesPoint(data);
     setDisplayTable(false);
     setEditingRowIndex(rowIndex);
   };
 
-  const handleDeleteWorkshift = async (id: string, rowIndex: number) => {
-    const res = await deleteWorkshift(id);
+  const handleDeleteSalesPoint = async (id: string, rowIndex: number) => {
+    const res = await deleteSalesPoint(id);
     if (res.status === 200) {
       toast({
         title: "Completado",
-        description: "El turno fue eliminado",
+        description: "El punto de venta fue eliminado",
       });
       if (rowIndex !== undefined) {
-        const updatedUsers = [...workshifts];
+        const updatedUsers = [...salespoints];
         updatedUsers.splice(rowIndex, 1);
-        setWorkshifts(updatedUsers);
+        setSalesPoints(updatedUsers);
       }
     } else {
       toast({
         title: "Error",
         description:
-          "Error al intentar eliminar el turno. Por favor, intente nuevamente",
+          "Error al intentar eliminar el punto de venta. Por favor, intente nuevamente",
         variant: "destructive",
       });
     }
   };
 
-  const handleUpdateWorkshift = (updatedData: Workshift) => {
+  const handleUpdateSalesPoint = (updatedData: SalesPoint) => {
     if (editingRowIndex !== null) {
-      const updatedWorkshifts = [...workshifts];
-      updatedWorkshifts[editingRowIndex] = Object.assign(
-        updatedWorkshifts[editingRowIndex],
+      const updatedSalesPoints = [...salespoints];
+      updatedSalesPoints[editingRowIndex] = Object.assign(
+        updatedSalesPoints[editingRowIndex],
         {
-          days: updatedData.days,
-          startTime: updatedData.startTime,
-          endTime: updatedData.endTime,
+          name: updatedData.name,
+          street: updatedData.street,
+          streetNumber: updatedData.streetNumber,
+          floor: updatedData.floor,
           updatedAt: Date.now(),
         }
       );
-      setWorkshifts(updatedWorkshifts);
+      setSalesPoints(updatedSalesPoints);
     }
     setDisplayTable(true);
   };
 
-  const columns: ColumnDef<Workshift>[] = [
+  const columns: ColumnDef<SalesPoint>[] = [
     ...([
       {
-        accessorKey: "days",
-        header: "Días",
+        accessorKey: "name",
+        header: "Nombre",
+      },
+      {
+        accessorKey: "street",
+        header: "Calle",
+      },
+      {
+        accessorKey: "streetNumber",
+        header: "Número de puerta",
+      },
+      {
+        accessorKey: "floor",
+        header: "Número de apartamento",
         cell: ({ getValue }) => {
-          const days = getValue() as Days[];
-          return days.map(
-            (day: string, index) =>
-              daysOptions.find((opt) => opt.value === day)?.label +
-                (index !== days.length - 1 ? ", " : "") || day
-          );
+          const value = getValue();
+          return value ? value : "No corresponde";
         },
       },
-      {
-        accessorKey: "startTime",
-        header: "Hora de Inicio",
-      },
-      {
-        accessorKey: "endTime",
-        header: "Hora de Finalización",
-      },
-    ] as ColumnDef<Workshift>[]),
+    ] as ColumnDef<SalesPoint>[]),
     ...commonColumns,
     ...([
       {
@@ -108,14 +109,16 @@ export default function SalesPointPage() {
         cell: ({ row }) => {
           return (
             <DataTableActions
-              onEdit={() => handleEditWorkshift(row.original, row.index)}
-              onDelete={() => handleDeleteWorkshift(row.original.id, row.index)}
+              onEdit={() => handleEditSalesPoint(row.original, row.index)}
+              onDelete={() =>
+                handleDeleteSalesPoint(row.original.id, row.index)
+              }
             />
           );
         },
       },
     ] as ColumnDef<any>[]),
-  ] as ColumnDef<Workshift>[];
+  ] as ColumnDef<SalesPoint>[];
 
   return (
     <ContentLayout title="Puntos de Venta">
@@ -135,7 +138,7 @@ export default function SalesPointPage() {
       <CardContainer>
         {displayTable ? (
           <div className="container mx-auto py-10">
-            <DataTable columns={columns} data={workshifts} />
+            <DataTable columns={columns} data={salespoints} />
           </div>
         ) : (
           <div>

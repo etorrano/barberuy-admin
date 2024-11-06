@@ -8,9 +8,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import AdminPanelLayout from "@/components/admin-panel/admin-panel-layout";
 import CardContainer from "@/components/layout/card-container/card-container";
-import { useLoaderData } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { commonColumns, DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { User, UserRole } from "@/models/user.model";
@@ -122,41 +121,39 @@ export default function UsersPage() {
   ] as ColumnDef<User>[];
 
   return (
-    <AdminPanelLayout>
-      <ContentLayout title="Usuarios">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <a href="/">Inicio</a>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Usuarios</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <CardContainer>
-          {displayTable ? (
-            <div className="container mx-auto py-10">
-              <DataTable columns={columns} data={users} />
+    <ContentLayout title="Usuarios">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">Inicio</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Usuarios</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <CardContainer>
+        {displayTable ? (
+          <div className="container mx-auto py-10">
+            <DataTable columns={columns} data={users} />
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center gap-4">
+              <ArrowLeft
+                className="cursor-pointer"
+                onClick={() => setDisplayTable(true)}
+              />
+              <span>Volver al listado</span>
             </div>
-          ) : (
-            <div>
-              <div className="flex items-center gap-4">
-                <ArrowLeft
-                  className="cursor-pointer"
-                  onClick={() => setDisplayTable(true)}
-                />
-                <span>Volver al listado</span>
-              </div>
-              <br />
-              <FormUser user={user} updateUser={handleUpdateUser} />
-            </div>
-          )}
-        </CardContainer>
-      </ContentLayout>
-    </AdminPanelLayout>
+            <br />
+            <FormUser user={user} updateUser={handleUpdateUser} />
+          </div>
+        )}
+      </CardContainer>
+    </ContentLayout>
   );
 }
