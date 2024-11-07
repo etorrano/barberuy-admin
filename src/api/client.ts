@@ -1,4 +1,5 @@
 import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
+import { CreateServicePayload, Service } from "@/models/service.model";
 import { CreateUserPayload, User } from "@/models/user.model";
 import { CreateWorkshiftPayload, Workshift } from "@/models/workshift.model";
 import axios from "axios";
@@ -25,6 +26,10 @@ export const deleteUser = (id: string | undefined) => {
 
 export const getUsers = (): Promise<User[]> => {
   return axios.get(`${API_URL}/auth`);
+};
+
+export const getStaff = (): Promise<User[]> => {
+  return axios.get(`${API_URL}/auth/staff`);
 };
 
 export const addWorkshift = (workshift: CreateWorkshiftPayload) => {
@@ -63,4 +68,23 @@ export const getSalesPoints = (): Promise<SalesPoint[]> => {
 
 export const deleteSalesPoint = (id: string | undefined) => {
   return axios.delete(`${API_URL}/salespoints/${id}`);
+};
+
+export const addService = (service: CreateServicePayload) => {
+  return axios.post(`${API_URL}/services`, service);
+};
+
+export const editService = (
+  id: string | undefined,
+  service: CreateServicePayload
+) => {
+  return axios.patch(`${API_URL}/services/${id}`, service);
+};
+
+export const getServices = (): Promise<Service[]> => {
+  return axios.get(`${API_URL}/services`);
+};
+
+export const deleteService = (id: string | undefined) => {
+  return axios.delete(`${API_URL}/services/${id}`);
 };

@@ -91,11 +91,11 @@ export function getMenuList(pathname: string): Group[] {
           icon: SquarePen,
           submenus: [
             {
-              href: "/posts",
+              href: "/servicios",
               label: "Ver listado",
             },
             {
-              href: "/posts/new",
+              href: "/servicios/nuevo",
               label: "Nuevo",
             },
           ],

@@ -3,13 +3,19 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.scss";
 import UsersPage from "./pages/users/users.tsx";
-import { getSalesPoints, getUsers, getWorkshifts } from "./api/client.ts";
+import {
+  getSalesPoints,
+  getServices,
+  getUsers,
+  getWorkshifts,
+} from "./api/client.ts";
 import UsersFormPage from "./pages/users/users-form.tsx";
 import WorkshiftsFormPage from "./pages/workshifts/workshifts-form.tsx";
 import WorkshiftsPage from "./pages/workshifts/workshifts.tsx";
 import AdminPanelLayout from "./components/admin-panel/admin-panel-layout.tsx";
 import SalesPointPage from "./pages/salespoint/salespoints.tsx";
 import SalesPointFormPage from "./pages/salespoint/salespoints-form.tsx";
+import ServicesPage from "./pages/services/services.tsx";
 
 const router = createBrowserRouter([
   {
@@ -38,7 +44,6 @@ const router = createBrowserRouter([
         path: "turnos/nuevo",
         element: <WorkshiftsFormPage />,
       },
-
       {
         path: "puntos",
         element: <SalesPointPage />,
@@ -50,6 +55,17 @@ const router = createBrowserRouter([
         path: "puntos/nuevo",
         element: <SalesPointFormPage />,
       },
+      {
+        path: "servicios",
+        element: <ServicesPage />,
+        loader: async () => {
+          return Promise.all([getServices(), getSalesPoints()]);
+        },
+      },
+      /* {
+        path: "servicios/nuevo",
+        element: <SalesPointFormPage />,
+      }, */
     ],
   },
 ]);
