@@ -106,12 +106,12 @@ export default function ServicesPage() {
         cell: ({ getValue }) => {
           const staff = getValue() as any[];
           return staff?.map((s, index) =>
-            index < staff.length - 1 ? s.name + ", " : s.name
+            index < staff.length - 1 ? s.staffName + ", " : s.staffName
           );
         },
       },
       {
-        accessorKey: "salespoints",
+        accessorKey: "salesPoints",
         header: "Puntos de Venta",
         cell: ({ getValue }) => {
           const salespoints = getValue() as SalesPoint[];
