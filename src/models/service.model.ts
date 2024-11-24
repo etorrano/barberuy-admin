@@ -1,5 +1,6 @@
 import { Promotion } from "./promotion.model";
 import { SalesPoint } from "./salespoint.model";
+import { Schedule } from "./schedule.model";
 
 export interface StaffService {
   id: string;
@@ -8,7 +9,9 @@ export interface StaffService {
   staffName: string;
   serviceId: number;
   serviceName: string;
-  scheduleId: number;
+  salesPointId: number;
+  salesPointName: string;
+  schedules: Schedule[];
 }
 
 export interface Service {
@@ -17,7 +20,6 @@ export interface Service {
   name: string;
   cost: number;
   duration: number;
-  salespoints: SalesPoint[];
   staff: StaffService[];
   promotions: Promotion[];
   createdAt: string;

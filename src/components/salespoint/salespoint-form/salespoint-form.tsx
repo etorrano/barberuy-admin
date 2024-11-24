@@ -13,23 +13,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import {
-  addSalesPoint,
-  addWorkshift,
-  editSalesPoint,
-  editWorkshift,
-} from "@/api/client";
+import { addSalesPoint, editSalesPoint } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { MultiSelect } from "@/components/ui/multi-select";
 import { useState } from "react";
 import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const formSchema = z.object({
   name: z.string(),

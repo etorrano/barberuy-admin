@@ -20,3 +20,16 @@ export interface CreateUserPayload {
   role: UserRole;
   password?: string;
 }
+
+export interface UserRelation {
+  id: number;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: number;
+  userEmail: string;
+  userName: string;
+}
+
+export interface Admin extends UserRelation {}
+export interface Staff extends UserRelation {}
+export interface Client extends UserRelation {}

@@ -20,27 +20,47 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addService, addUser, editService, editUser } from "@/api/client";
+import { addService, editService } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { User, UserRole } from "@/models/user.model";
 import { useState } from "react";
+import { Service } from "@/models/service.model";
+import { SalesPoint } from "@/models/salespoint.model";
+import { MultiSelect } from "@/components/ui/multi-select";
 
-const ServiceForm = (props: { service?: User; updateService?: any }) => {
+const ServiceForm = (props: {
+  service?: Service;
+  salespoints: SalesPoint[];
+  updateService?: any;
+}) => {
   const { toast } = useToast();
 
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.service);
+  const [selectedSalesPoints, setSelectedSalesPoints] = useState<string[]>(
+    Array.from(
+      new Set(props?.service?.staff?.map((s) => s.salesPointId.toString()))
+    ) || []
+  );
+  const [selectedStaff, setSelectedStaff] = useState<string[]>(
+    Array.from(
+      new Set(props?.service?.staff?.map((s) => s.staffId.toString()))
+    ) || []
+  );
 
   const formSchema = z.object({
     key: z.string(),
     name: z.string(),
     cost: z.number(),
     duration: z.number(),
-    salespoints: z.array(z.number()),
-    staff: z.array(z.number()),
+    salespoints: z.array(z.string()),
+    staff: z.array(z.string()),
   });
 
   const defaultValues = isEditForm
-    ? props.service
+    ? {
+        ...props.service,
+        salespoints: selectedSalesPoints || [],
+        staff: selectedStaff || [],
+      }
     : {
         key: "",
         name: "",
@@ -68,13 +88,18 @@ const ServiceForm = (props: { service?: User; updateService?: any }) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     let res: any;
     let successStatus = 201;
+    const mapValues = {
+      ...values,
+      salespoints: values.salespoints.map((s) => Number(s)),
+      staff: values.staff.map((s) => Number(s)),
+    };
     if (isEditForm) {
       successStatus = 200;
-      res = await editService(props.service?.id, values).catch(() =>
+      res = await editService(props.service?.id, mapValues).catch(() =>
         handleUserError()
       );
     } else {
-      res = await addService(values).catch(() => handleUserError());
+      res = await addService(mapValues).catch(() => handleUserError());
     }
     if (res.status === successStatus) {
       form.reset();
@@ -146,28 +171,59 @@ const ServiceForm = (props: { service?: User; updateService?: any }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Seleccionar Punto de Venta</FormLabel>
-              <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                defaultValue={field.value.toString()}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar el Punto de Venta" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="1">Administrador</SelectItem>
-                  <SelectItem value="2">Empleado</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <MultiSelect
+                  options={props?.salespoints?.map((s) => ({
+                    label: s.name,
+                    value: s.id.toString(),
+                  }))}
+                  onValueChange={setSelectedSalesPoints}
+                  defaultValue={selectedSalesPoints}
+                  placeholder="Seleccionar Puntos de Venta"
+                  variant="inverted"
+                  {...field}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        {/* 
+        <FormField
+          control={form.control}
+          name="staff"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Seleccionar Punto de Venta</FormLabel>
+                <FormControl>                  
+                  <MultiSelect
+                      options={form.getValues().salespoints.map(salespoint => salespoint.staff?.map((s) => (({
+                        label: s.userName,
+                        value: s.userId.toString(),
+                      })))}
+                      onValueChange={setSelectedSalesPoints}
+                      defaultValue={selectedSalesPoints}
+                      placeholder="Seleccionar Puntos de Venta"
+                      variant="inverted"
+                      {...field}
+                    />
+                </FormControl>
+                <SelectContent>
+                  {props?.salespoints?.map((s) => {
+                    return s.staff?.map((staff) => (
+                      <SelectItem value={staff.userId.toString()}>
+                        {staff.userName}
+                      </SelectItem>
+                    ));
+                  })}
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
         <Button type="submit">Enviar</Button>
       </form>
     </Form>
   );
 };
 
-export default FormUser;
+export default ServiceForm;

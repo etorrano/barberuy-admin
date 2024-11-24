@@ -15,9 +15,10 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableActions } from "@/components/ui/data-table-actions";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Service } from "@/models/service.model";
+import { Service, StaffService } from "@/models/service.model";
 import { deleteService } from "@/api/client";
 import { SalesPoint } from "@/models/salespoint.model";
+import ServiceForm from "@/components/service/service-form/service-form";
 
 export default function ServicesPage() {
   const data: any = useLoaderData();
@@ -93,18 +94,19 @@ export default function ServicesPage() {
       },
       {
         accessorKey: "cost",
-        header: "Costo",
+        header: "Costo (Pesos)",
       },
       {
         accessorKey: "duration",
-        header: "Duración",
+        header: "Duración (Horas)",
+        cell: ({ getValue }) => (getValue() as number) / 60000,
       },
 
       {
         accessorKey: "staff",
         header: "Empleados",
         cell: ({ getValue }) => {
-          const staff = getValue() as any[];
+          const staff = getValue() as StaffService[];
           return staff?.map((s, index) =>
             index < staff.length - 1 ? s.staffName + ", " : s.staffName
           );
@@ -167,10 +169,14 @@ export default function ServicesPage() {
               <span>Volver al listado</span>
             </div>
             <br />
-            {/* <ServiceForm
-              service={service}
-              updateService={handleUpdateService}
-            /> */}
+            {
+              <ServiceForm
+                service={service}
+                salespoints={salespoints}
+                staff={staff}
+                updateService={handleUpdateService}
+              />
+            }
           </div>
         )}
       </CardContainer>

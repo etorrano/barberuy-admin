@@ -1,3 +1,6 @@
+import { StaffService } from "./service.model";
+import { Admin, Staff } from "./user.model";
+
 export interface CreateSalesPointPayload {
   name: string;
   street: string;
@@ -15,4 +18,7 @@ export type SalesPoint = {
   companyId: number;
   createdAt: string;
   updatedAt: string;
+  admins?: Admin[];
+  staff?: Staff[];
+  staffServices?: StaffService[];
 };
