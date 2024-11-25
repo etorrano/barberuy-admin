@@ -72,7 +72,7 @@ export default function ServicesPage() {
           name: updatedData.name,
           cost: updatedData.cost,
           duration: updatedData.duration,
-          salespoints: updatedData.salespoints,
+          salespoints: updatedData.salesPoints,
           staff: updatedData.staff,
           updatedAt: Date.now(),
         }
@@ -107,18 +107,18 @@ export default function ServicesPage() {
         header: "Empleados",
         cell: ({ getValue }) => {
           const staff = getValue() as StaffService[];
-          return staff?.map((s, index) =>
-            index < staff.length - 1 ? s.staffName + ", " : s.staffName
+          return Array.from(new Set(staff?.map((s) => s.staffName))).map(
+            (name, index) => (index < staff.length - 1 ? name + ", " : name)
           );
         },
       },
       {
-        accessorKey: "salesPoints",
+        accessorKey: "staff",
         header: "Puntos de Venta",
         cell: ({ getValue }) => {
-          const salespoints = getValue() as SalesPoint[];
-          return salespoints?.map((s, index) =>
-            index < salespoints.length - 1 ? s.name + ", " : s.name
+          const staff = getValue() as StaffService[];
+          return Array.from(new Set(staff?.map((s) => s.salesPointName))).map(
+            (name, index) => (index < staff.length - 1 ? name + ", " : name)
           );
         },
       },
@@ -173,7 +173,6 @@ export default function ServicesPage() {
               <ServiceForm
                 service={service}
                 salespoints={salespoints}
-                staff={staff}
                 updateService={handleUpdateService}
               />
             }

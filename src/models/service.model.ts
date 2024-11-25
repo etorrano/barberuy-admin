@@ -20,6 +20,7 @@ export interface Service {
   name: string;
   cost: number;
   duration: number;
+  salesPoints: SalesPoint[];
   staff: StaffService[];
   promotions: Promotion[];
   createdAt: string;

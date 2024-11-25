@@ -1,7 +1,7 @@
 ("use client");
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { addService, editService } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Service } from "@/models/service.model";
 import { SalesPoint } from "@/models/salespoint.model";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -45,6 +45,25 @@ const ServiceForm = (props: {
       new Set(props?.service?.staff?.map((s) => s.staffId.toString()))
     ) || []
   );
+  /* const [salespointsStaff, setSalespointsStaff] = useState<
+    { id: number; name: string }[]
+  >([]); */
+  //const [allStaffOptions, setAllStaffOptions] = useState<{ id: number, name: string }[]>([]);
+
+  /*   useEffect(() => {
+    const formSalesPointsStaff = form?.getValues()?.salesPointsStaff;
+    if (formSalesPointsStaff?.length === 0) {
+      props?.salespoints?.map((salespoint) =>
+        append({ salesPointId: salespoint.id, salesPointStaff: [] })
+      );
+    } else {
+      selectedSalesPoints?.forEach((salesPoint) => {
+        const salesPointStaff = formSalesPointsStaff.find(
+          (s) => s.salesPointId === +salesPoint
+        );
+      });
+    }
+  }, [selectedSalesPoints]); */
 
   const formSchema = z.object({
     key: z.string(),
@@ -52,14 +71,38 @@ const ServiceForm = (props: {
     cost: z.number(),
     duration: z.number(),
     salespoints: z.array(z.string()),
-    staff: z.array(z.string()),
+    salesPointsStaff: z.array(
+      z.object({
+        salesPointId: z.number(),
+        salesPointStaff: z.array(z.string()),
+      })
+    ),
+  });
+  type FormValues = z.infer<typeof formSchema>;
+
+  const salesPointsStaff: FormValues["salesPointsStaff"] = [];
+
+  props.service?.staff?.forEach((staffService) => {
+    const salesPoint = salesPointsStaff.find(
+      (s) => s.salesPointId === staffService.salesPointId
+    );
+    if (salesPoint) {
+      salesPoint.salesPointStaff.push(staffService.staffId.toString());
+    } else {
+      salesPointsStaff.push({
+        salesPointId: staffService.salesPointId,
+        salesPointStaff: [staffService.staffId.toString()],
+      });
+    }
   });
 
   const defaultValues = isEditForm
     ? {
         ...props.service,
+        duration:
+          (props.service?.duration && props.service?.duration / 60000) || 0,
         salespoints: selectedSalesPoints || [],
-        staff: selectedStaff || [],
+        salesPointsStaff: salesPointsStaff,
       }
     : {
         key: "",
@@ -67,13 +110,51 @@ const ServiceForm = (props: {
         cost: 0,
         duration: 0,
         salespoints: [],
-        staff: [],
+        salesPointsStaff: [],
       };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "salesPointsStaff",
+  });
+
+  const salesPointsValueChangeHandler = (newSalesPointsValue: any[]) => {
+    const formSalesPointsStaff = form?.getValues()?.salesPointsStaff;
+    if (formSalesPointsStaff?.length === 0) {
+      props?.salespoints?.map((salespoint) =>
+        append({ salesPointId: +salespoint.id, salesPointStaff: [] })
+      );
+    } else {
+      setSelectedSalesPoints(newSalesPointsValue);
+      formSalesPointsStaff.forEach((formValue, index) => {
+        if (
+          newSalesPointsValue.indexOf(formValue.salesPointId.toString()) === -1
+        )
+          remove(index);
+      });
+      newSalesPointsValue.forEach(
+        (salesPoint: { label: string; value: string }) => {
+          if (!formSalesPointsStaff.find((s) => s.salesPointId === +salesPoint))
+            append({ salesPointId: +salesPoint.value, salesPointStaff: [] });
+        }
+      );
+    }
+  };
+
+  const salesPointsStaffValueChangeHandler = (
+    newSalesPointsStaffValue: any[],
+    field: {
+      salesPointId: number;
+      salesPointStaff: string[];
+    }
+  ) => {
+    field.salesPointStaff = newSalesPointsStaffValue;
+  };
 
   const handleUserError = () => {
     toast({
@@ -86,7 +167,7 @@ const ServiceForm = (props: {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    let res: any;
+    /* let res: any;
     let successStatus = 201;
     const mapValues = {
       ...values,
@@ -108,7 +189,7 @@ const ServiceForm = (props: {
         description: `El servicio fue ${isEditForm ? "editado" : "creado"}`,
       });
       if (isEditForm) props.updateService(values);
-    }
+    } */
   }
   return (
     <Form {...form}>
@@ -144,7 +225,7 @@ const ServiceForm = (props: {
           name="cost"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Costo</FormLabel>
+              <FormLabel>Costo (Pesos)</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -157,7 +238,7 @@ const ServiceForm = (props: {
           name="duration"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Duración</FormLabel>
+              <FormLabel>Duración (Horas)</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -177,7 +258,9 @@ const ServiceForm = (props: {
                     label: s.name,
                     value: s.id.toString(),
                   }))}
-                  onValueChange={setSelectedSalesPoints}
+                  onValueChange={(value) =>
+                    salesPointsValueChangeHandler(value)
+                  }
                   defaultValue={selectedSalesPoints}
                   placeholder="Seleccionar Puntos de Venta"
                   variant="inverted"
@@ -188,38 +271,54 @@ const ServiceForm = (props: {
             </FormItem>
           )}
         />
-        {/* 
-        <FormField
-          control={form.control}
-          name="staff"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Seleccionar Punto de Venta</FormLabel>
-                <FormControl>                  
-                  <MultiSelect
-                      options={form.getValues().salespoints.map(salespoint => salespoint.staff?.map((s) => (({
-                        label: s.userName,
-                        value: s.userId.toString(),
-                      })))}
-                      onValueChange={setSelectedSalesPoints}
-                      defaultValue={selectedSalesPoints}
-                      placeholder="Seleccionar Puntos de Venta"
-                      variant="inverted"
-                      {...field}
-                    />
-                </FormControl>
-                <SelectContent>
-                  {props?.salespoints?.map((s) => {
-                    return s.staff?.map((staff) => (
-                      <SelectItem value={staff.userId.toString()}>
-                        {staff.userName}
-                      </SelectItem>
-                    ));
-                  })}
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
+
+        {
+          //props?.salespoints?.map(salespoint => field.)
+          fields.map((salespointsField, index) => {
+            const salespoint = props.salespoints?.find(
+              (s) => +s.id === salespointsField.salesPointId
+            );
+            return (
+              salespoint &&
+              salespoint.staff &&
+              salespoint.staff.length > 0 && (
+                <FormField
+                  control={form.control}
+                  name={`salesPointsStaff.${index}`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Seleccionar Empleados para {salespoint.name}
+                      </FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          options={
+                            salespoint.staff?.map((s) => ({
+                              label: s.userName,
+                              value: s.userId.toString(),
+                            })) || [{ label: "", value: "" }]
+                          }
+                          onValueChange={(value) =>
+                            salesPointsStaffValueChangeHandler(
+                              value,
+                              salespointsField
+                            )
+                          }
+                          defaultValue={salespointsField.salesPointStaff}
+                          placeholder="Seleccionar Empleados"
+                          variant="inverted"
+                          {...field}
+                          value={salespointsField.salesPointStaff}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )
+            );
+          })
+        }
         <Button type="submit">Enviar</Button>
       </form>
     </Form>

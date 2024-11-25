@@ -18,6 +18,8 @@ import { ArrowLeft } from "lucide-react";
 import SalesPointForm from "@/components/salespoint/salespoint-form/salespoint-form";
 import { SalesPoint } from "@/models/salespoint.model";
 import { deleteSalesPoint } from "@/api/client";
+import { Staff } from "@/models/user.model";
+import { StaffService } from "@/models/service.model";
 
 export default function SalesPointPage() {
   const data: any = useLoaderData();
@@ -99,6 +101,26 @@ export default function SalesPointPage() {
         cell: ({ getValue }) => {
           const value = getValue();
           return value ? value : "No corresponde";
+        },
+      },
+      {
+        accessorKey: "staff",
+        header: "Empleados",
+        cell: ({ getValue }) => {
+          const staff = getValue() as Staff[];
+          return staff?.map((s, index) =>
+            index < staff.length - 1 ? s.userName + ", " : s.userName
+          );
+        },
+      },
+      {
+        accessorKey: "staffServices",
+        header: "Servicios",
+        cell: ({ getValue }) => {
+          const services = getValue() as StaffService[];
+          return services?.map((s, index) =>
+            index < services.length - 1 ? s.serviceName + ", " : s.serviceName
+          );
         },
       },
     ] as ColumnDef<SalesPoint>[]),
