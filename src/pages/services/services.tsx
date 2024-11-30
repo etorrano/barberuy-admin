@@ -101,8 +101,8 @@ export default function ServicesPage() {
         header: "Duración (Horas)",
         cell: ({ getValue }) => (getValue() as number) / 60000,
       },
-
       {
+        id: "staff",
         accessorKey: "staff",
         header: "Empleados",
         cell: ({ getValue }) => {
@@ -113,6 +113,7 @@ export default function ServicesPage() {
         },
       },
       {
+        id: "staff_salespoint",
         accessorKey: "staff",
         header: "Puntos de Venta",
         cell: ({ getValue }) => {

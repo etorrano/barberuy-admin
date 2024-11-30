@@ -272,53 +272,51 @@ const ServiceForm = (props: {
           )}
         />
 
-        {
-          //props?.salespoints?.map(salespoint => field.)
-          fields.map((salespointsField, index) => {
-            const salespoint = props.salespoints?.find(
-              (s) => +s.id === salespointsField.salesPointId
-            );
-            return (
-              salespoint &&
-              salespoint.staff &&
-              salespoint.staff.length > 0 && (
-                <FormField
-                  control={form.control}
-                  name={`salesPointsStaff.${index}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Seleccionar Empleados para {salespoint.name}
-                      </FormLabel>
-                      <FormControl>
-                        <MultiSelect
-                          options={
-                            salespoint.staff?.map((s) => ({
-                              label: s.userName,
-                              value: s.userId.toString(),
-                            })) || [{ label: "", value: "" }]
-                          }
-                          onValueChange={(value) =>
-                            salesPointsStaffValueChangeHandler(
-                              value,
-                              salespointsField
-                            )
-                          }
-                          defaultValue={salespointsField.salesPointStaff}
-                          placeholder="Seleccionar Empleados"
-                          variant="inverted"
-                          {...field}
-                          value={salespointsField.salesPointStaff}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )
-            );
-          })
-        }
+        {fields.map((salespointsField, index) => {
+          const salespoint = props.salespoints?.find(
+            (s) => +s.id === salespointsField.salesPointId
+          );
+          return (
+            salespoint &&
+            salespoint.staff &&
+            salespoint.staff.length > 0 && (
+              <FormField
+                key={`key-salesPointsStaff-${salespoint.id}`}
+                control={form.control}
+                name={`salesPointsStaff.${index}`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Seleccionar Empleados para {salespoint.name}
+                    </FormLabel>
+                    <FormControl>
+                      <MultiSelect
+                        options={
+                          salespoint.staff?.map((s) => ({
+                            label: s.userName,
+                            value: s.userId.toString(),
+                          })) || [{ label: "", value: "" }]
+                        }
+                        onValueChange={(value) =>
+                          salesPointsStaffValueChangeHandler(
+                            value,
+                            salespointsField
+                          )
+                        }
+                        defaultValue={salespointsField.salesPointStaff}
+                        placeholder="Seleccionar Empleados"
+                        variant="inverted"
+                        {...field}
+                        value={salespointsField.salesPointStaff}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )
+          );
+        })}
         <Button type="submit">Enviar</Button>
       </form>
     </Form>
