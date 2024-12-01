@@ -13,16 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { addService, editService } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Service } from "@/models/service.model";
 import { SalesPoint } from "@/models/salespoint.model";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -35,35 +28,12 @@ const ServiceForm = (props: {
   const { toast } = useToast();
 
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.service);
+  const initialSalesPoints = Array.from(
+    new Set(props?.service?.staff?.map((s) => s.salesPointId.toString()))
+  ) || [];
   const [selectedSalesPoints, setSelectedSalesPoints] = useState<string[]>(
-    Array.from(
-      new Set(props?.service?.staff?.map((s) => s.salesPointId.toString()))
-    ) || []
+    initialSalesPoints
   );
-  const [selectedStaff, setSelectedStaff] = useState<string[]>(
-    Array.from(
-      new Set(props?.service?.staff?.map((s) => s.staffId.toString()))
-    ) || []
-  );
-  /* const [salespointsStaff, setSalespointsStaff] = useState<
-    { id: number; name: string }[]
-  >([]); */
-  //const [allStaffOptions, setAllStaffOptions] = useState<{ id: number, name: string }[]>([]);
-
-  /*   useEffect(() => {
-    const formSalesPointsStaff = form?.getValues()?.salesPointsStaff;
-    if (formSalesPointsStaff?.length === 0) {
-      props?.salespoints?.map((salespoint) =>
-        append({ salesPointId: salespoint.id, salesPointStaff: [] })
-      );
-    } else {
-      selectedSalesPoints?.forEach((salesPoint) => {
-        const salesPointStaff = formSalesPointsStaff.find(
-          (s) => s.salesPointId === +salesPoint
-        );
-      });
-    }
-  }, [selectedSalesPoints]); */
 
   const formSchema = z.object({
     key: z.string(),
@@ -102,7 +72,7 @@ const ServiceForm = (props: {
         duration:
           (props.service?.duration && props.service?.duration / 60000) || 0,
         salespoints: selectedSalesPoints || [],
-        salesPointsStaff: salesPointsStaff,
+        salesPointsStaff: [...salesPointsStaff],
       }
     : {
         key: "",
@@ -115,7 +85,7 @@ const ServiceForm = (props: {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    ...defaultValues,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -148,12 +118,20 @@ const ServiceForm = (props: {
 
   const salesPointsStaffValueChangeHandler = (
     newSalesPointsStaffValue: any[],
-    field: {
-      salesPointId: number;
-      salesPointStaff: string[];
-    }
+    fieldIndex: number
   ) => {
-    field.salesPointStaff = newSalesPointsStaffValue;
+    const currentSalesPointsStaff = form.getValues("salesPointsStaff");
+    const updatedSalesPointsStaff = [...currentSalesPointsStaff];
+  
+    updatedSalesPointsStaff[fieldIndex] = {
+      salesPointId: updatedSalesPointsStaff[fieldIndex].salesPointId,
+      salesPointStaff: newSalesPointsStaffValue,
+    };
+  
+    form.setValue("salesPointsStaff", updatedSalesPointsStaff, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   const handleUserError = () => {
@@ -167,29 +145,27 @@ const ServiceForm = (props: {
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    /* let res: any;
+    let res: any;
     let successStatus = 201;
-    const mapValues = {
-      ...values,
-      salespoints: values.salespoints.map((s) => Number(s)),
-      staff: values.staff.map((s) => Number(s)),
-    };
+    console.log(values)
+    const payload = { ...values, ...{ salespoints: props.salespoints, duration: values.duration*60000 }};
+    console.log(payload)
     if (isEditForm) {
       successStatus = 200;
-      res = await editService(props.service?.id, mapValues).catch(() =>
+      res = await editService(props.service?.id, payload).catch(() =>
         handleUserError()
       );
     } else {
-      res = await addService(mapValues).catch(() => handleUserError());
+      res = await addService(payload).catch(() => handleUserError());
     }
     if (res.status === successStatus) {
-      form.reset();
+      form.reset(defaultValues);
       toast({
         title: "Completado",
         description: `El servicio fue ${isEditForm ? "editado" : "creado"}`,
       });
-      if (isEditForm) props.updateService(values);
-    } */
+      if (isEditForm) props.updateService({...values, ...{duration: values.duration*60000, staff: res.data }});
+    }
   }
   return (
     <Form {...form}>
@@ -227,7 +203,7 @@ const ServiceForm = (props: {
             <FormItem>
               <FormLabel>Costo (Pesos)</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field}  type="number" onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value, 10) : '')} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -240,7 +216,7 @@ const ServiceForm = (props: {
             <FormItem>
               <FormLabel>Duración (Horas)</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} type="number" onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value, 10) : '')}/>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -300,14 +276,14 @@ const ServiceForm = (props: {
                         onValueChange={(value) =>
                           salesPointsStaffValueChangeHandler(
                             value,
-                            salespointsField
+                            index
                           )
                         }
-                        defaultValue={salespointsField.salesPointStaff}
+                        defaultValue={salespointsField.salesPointStaff || ''}
                         placeholder="Seleccionar Empleados"
                         variant="inverted"
                         {...field}
-                        value={salespointsField.salesPointStaff}
+                        value={salespointsField.salesPointStaff || ''}
                       />
                     </FormControl>
                     <FormMessage />

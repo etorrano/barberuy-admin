@@ -16,6 +16,7 @@ import AdminPanelLayout from "./components/admin-panel/admin-panel-layout.tsx";
 import SalesPointPage from "./pages/salespoint/salespoints.tsx";
 import SalesPointFormPage from "./pages/salespoint/salespoints-form.tsx";
 import ServicesPage from "./pages/services/services.tsx";
+import ServicesFormPage from "./pages/services/services-form.tsx";
 
 const router = createBrowserRouter([
   {
@@ -62,10 +63,13 @@ const router = createBrowserRouter([
           return Promise.all([getServices(), getSalesPoints()]);
         },
       },
-      /* {
+      {
         path: "servicios/nuevo",
-        element: <SalesPointFormPage />,
-      }, */
+        element: <ServicesFormPage />,
+        loader: async () => {
+          return getSalesPoints();
+        },
+      },
     ],
   },
 ]);

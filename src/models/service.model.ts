@@ -32,6 +32,6 @@ export interface CreateServicePayload {
   name: string;
   cost: number;
   duration: number;
-  salespoints: number[];
-  staff: number[];
+  salespoints: SalesPoint[];
+  salesPointsStaff: { salesPointId: number, salesPointStaff: string[] }[];
 }

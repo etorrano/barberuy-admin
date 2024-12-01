@@ -10,11 +10,13 @@ import {
 } from "@/components/ui/breadcrumb";
 import FormUser from "@/components/user/form-user/form-user";
 import CardContainer from "@/components/layout/card-container/card-container";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+import ServiceForm from "@/components/service/service-form/service-form";
 
-export default function UsersFormPage() {
+export default function ServicesFormPage() {
+  const data: any = useLoaderData();  
   return (
-    <ContentLayout title="Usuarios">
+    <ContentLayout title="Servicios">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -25,7 +27,7 @@ export default function UsersFormPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/usuarios">Usuarios</Link>
+              <Link to="/servicios">Servicios</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -35,7 +37,9 @@ export default function UsersFormPage() {
         </BreadcrumbList>
       </Breadcrumb>
       <CardContainer>
-        <FormUser />
+      <ServiceForm
+        salespoints={data?.data}
+      />
       </CardContainer>
     </ContentLayout>
   );
