@@ -13,16 +13,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import { addSalesPoint, editSalesPoint } from "@/api/client";
+import { addSalesPoint, editSalesPoint, getStaff } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const formSchema = z.object({
   name: z.string(),
   street: z.string(),
   streetNumber: z.string(),
   floor: z.string().optional(),
+  staff: z.array(z.string()),
 });
 
 const SalesPointForm = (props: {
@@ -31,14 +33,58 @@ const SalesPointForm = (props: {
 }) => {
   const { toast } = useToast();
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.salespoint);
+  const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
+  const [staffOptions, setStaffOptions] = useState<{ label: string, value: string }[]>([]);
+  const [loading, setLoading] = useState(true); // Track loading state
 
-  const defaultValues = isEditForm
-    ? props.salespoint
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      street: "",
+      streetNumber: "",
+      floor: "",
+      staff: [],
+    },
+  });
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const staffArray = (await getStaff())?.data;
+        console.log("Fetched Staff:", staffArray);
+        setStaffOptions(staffArray?.map((s) => ({ label: s.name, value: s.id.toString() })));
+        if (props.salespoint?.staff) {
+          const selected = props.salespoint.staff.map((s) => s.id.toString());
+          setSelectedStaff(selected);
+          form.reset({
+            ...props.salespoint,
+            staff: selected,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch staff:", error);
+      } finally {
+        setLoading(false); // Fetch completed
+      }
+    };
+
+    fetchStaff();
+  }, [props.salespoint, form]);
+
+  if (loading) return <p>Loading...</p>;
+  /* useEffect(() => {
+    setSelectedStaff(props?.salespoint?.staff?.map(s => s.id.toString()) || []);
+  }, [props.salespoint]); */
+
+/*   const defaultValues = isEditForm
+    ? { ...props.salespoint, ...{ floor: props?.salespoint?.floor || '',staff: selectedStaff } }
     : {
         name: "",
         street: "",
         streetNumber: "",
         floor: "",
+        staff: selectedStaff,
       };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,7 +92,24 @@ const SalesPointForm = (props: {
     defaultValues,
   });
 
-  const handleWorkshiftError = () => {
+  useEffect(() => {
+    if (props.salespoint?.staff) {
+      const selectedStaff = props.salespoint.staff.map((s) => s.id.toString());
+      setSelectedStaff(selectedStaff);
+      form.setValue("staff", props.salespoint.staff.map((s) => s.id.toString())); // Sync form state
+    }
+  }, [props.salespoint, form]);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      const staffArray = (await getStaff())?.data;
+      console.log(staffArray)
+      setStaffOptions(staffArray?.map(s => ({ label: s.name, value: s.id.toString() })));
+    };
+    fetchStaff();
+  }, []); */
+
+  const handleSalesPointError = () => {
     toast({
       title: "Error",
       description: `Error al intentar ${
@@ -62,15 +125,16 @@ const SalesPointForm = (props: {
     const values: CreateSalesPointPayload = {
       ...formValues,
       ...{ companyId: 1 },
+      ...{ staff: formValues.staff.map(s => ({ id: Number(s)}))},
     };
 
     if (isEditForm) {
       successStatus = 200;
       res = await editSalesPoint(props.salespoint?.id, values).catch(() =>
-        handleWorkshiftError()
+        handleSalesPointError()
       );
     } else {
-      res = await addSalesPoint(values).catch(() => handleWorkshiftError());
+      res = await addSalesPoint(values).catch(() => handleSalesPointError());
     }
     if (res.status === successStatus) {
       form.reset();
@@ -138,6 +202,27 @@ const SalesPointForm = (props: {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="staff"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Seleccionar Empleados</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={staffOptions}
+                  onValueChange={setSelectedStaff}
+                  defaultValue={selectedStaff}
+                  placeholder="Seleccionar Empleados"
+                  variant="inverted"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit">Enviar</Button>
       </form>
     </Form>

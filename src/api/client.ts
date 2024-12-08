@@ -2,7 +2,7 @@ import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
 import { CreateServicePayload, Service } from "@/models/service.model";
 import { CreateUserPayload, User } from "@/models/user.model";
 import { CreateWorkshiftPayload, Workshift } from "@/models/workshift.model";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 const API_URL = "http://localhost:3000";
 
@@ -24,11 +24,11 @@ export const deleteUser = (id: string | undefined) => {
   return axios.delete(`${API_URL}/auth/${id}`);
 };
 
-export const getUsers = (): Promise<User[]> => {
+export const getUsers = (): Promise<AxiosResponse<User[]>> => {
   return axios.get(`${API_URL}/auth`);
 };
 
-export const getStaff = (): Promise<User[]> => {
+export const getStaff = (): Promise<AxiosResponse<User[]>> => {
   return axios.get(`${API_URL}/auth/staff`);
 };
 
@@ -43,7 +43,7 @@ export const editWorkshift = (
   return axios.patch(`${API_URL}/workshifts/${id}`, workshift);
 };
 
-export const getWorkshifts = (): Promise<Workshift[]> => {
+export const getWorkshifts = (): Promise<AxiosResponse<Workshift[]>> => {
   return axios.get(`${API_URL}/workshifts`);
 };
 
@@ -62,7 +62,7 @@ export const editSalesPoint = (
   return axios.patch(`${API_URL}/salespoints/${id}`, salespoint);
 };
 
-export const getSalesPoints = (): Promise<SalesPoint[]> => {
+export const getSalesPoints = (): Promise<AxiosResponse<SalesPoint[]>> => {
   return axios.get(`${API_URL}/salespoints`);
 };
 
@@ -81,7 +81,7 @@ export const editService = (
   return axios.patch(`${API_URL}/services/${id}`, service);
 };
 
-export const getServices = (): Promise<Service[]> => {
+export const getServices = (): Promise<AxiosResponse<Service[]>> => {
   return axios.get(`${API_URL}/services`);
 };
 

@@ -15,7 +15,7 @@ import {
 import { z } from "@/config/zod/zod-es";
 import { addService, editService } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Service } from "@/models/service.model";
 import { SalesPoint } from "@/models/salespoint.model";
 import { MultiSelect } from "@/components/ui/multi-select";
@@ -52,42 +52,44 @@ const ServiceForm = (props: {
 
   const salesPointsStaff: FormValues["salesPointsStaff"] = [];
 
-  props.service?.staff?.forEach((staffService) => {
-    const salesPoint = salesPointsStaff.find(
-      (s) => s.salesPointId === staffService.salesPointId
-    );
-    if (salesPoint) {
-      salesPoint.salesPointStaff.push(staffService.staffId.toString());
-    } else {
-      salesPointsStaff.push({
-        salesPointId: staffService.salesPointId,
-        salesPointStaff: [staffService.staffId.toString()],
-      });
-    }
-  });
-
-  const defaultValues = isEditForm
-    ? {
-        ...props.service,
-        duration:
-          (props.service?.duration && props.service?.duration / 60000) || 0,
-        salespoints: selectedSalesPoints || [],
-        salesPointsStaff: [...salesPointsStaff],
-      }
-    : {
-        key: "",
-        name: "",
-        cost: 0,
-        duration: 0,
-        salespoints: [],
-        salesPointsStaff: [],
-      };
+  const defaultValues = {
+    key: "",
+    name: "",
+    cost: 0,
+    duration: 0,
+    salespoints: [],
+    salesPointsStaff: [],
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    ...defaultValues,
+  resolver: zodResolver(formSchema),
+  ...defaultValues,
   });
 
+  useEffect(() => {
+    props.service?.staff?.forEach((staffService) => {
+      const salesPoint = salesPointsStaff.find(
+        (s) => s.salesPointId === staffService.salesPointId
+      );
+      if (salesPoint) {
+        salesPoint.salesPointStaff.push(staffService.staffId.toString());
+      } else {
+        salesPointsStaff.push({
+          salesPointId: staffService.salesPointId,
+          salesPointStaff: [staffService.staffId.toString()],
+        });
+      }
+    });
+  
+    form.reset({
+      ...props.service,
+      duration:
+        (props.service?.duration && props.service?.duration / 60000) || 0,
+      salespoints: selectedSalesPoints || [],
+      salesPointsStaff: salesPointsStaff,
+    });
+  }, [props.service, form, salesPointsStaff, selectedSalesPoints])
+  
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "salesPointsStaff",
