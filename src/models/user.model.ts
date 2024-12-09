@@ -1,3 +1,5 @@
+import { SalesPoint } from "./salespoint.model";
+
 export enum UserRole {
   SUPERADMIN = "SUPERADMIN",
   ADMIN = "ADMIN",
@@ -10,6 +12,7 @@ export type User = {
   name: string;
   email: string;
   role: UserRole;
+  salesPoints?: SalesPoint[];
   createdAt: string;
   updatedAt: string;
 };

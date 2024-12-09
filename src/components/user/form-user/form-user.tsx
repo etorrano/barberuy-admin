@@ -20,14 +20,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addUser, editUser } from "@/api/client";
+import { addUser, editUser, getSalesPoints } from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
 import { User, UserRole } from "@/models/user.model";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 const FormUser = (props: { user?: User; updateUser?: any }) => {
   const { toast } = useToast();
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.user);
+  const [showSalesPoints, setShowSalesPoints] = useState<boolean>(props?.user?.salesPoints && props?.user?.salesPoints?.length > 0 || false);
+  const initialSalesPoints = props.user?.salesPoints?.map(s => s.id.toString() ) || [];
+  const [selectedSalesPoints, setSelectedSalesPoints] = useState<string[]>(
+    initialSalesPoints
+  );
+  const [salesPointsOptions, setSalesPointsOptions] = useState<{ label: string, value: string }[]>([]);
+  const [loading, setLoading] = useState(true); // Track loading state
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const staffArray = (await getSalesPoints())?.data;
+        setSalesPointsOptions(staffArray?.map((s) => ({ label: s.name, value: s.id.toString() })));
+        /* if (props.salespoint?.staff) {
+          const selected = props.salespoint.staff.map((s) => s.id.toString());
+          setSelectedStaff(selected);
+          form.reset({
+            ...props.salespoint,
+            staff: selected,
+          });
+        } */
+      } catch (error) {
+        console.error("Failed to fetch salespoints:", error);
+      } finally {
+        setLoading(false); // Fetch completed
+      }
+    };
+
+    fetchStaff();
+  }, []);
 
   const formSchema = z
     .object({
@@ -36,8 +67,9 @@ const FormUser = (props: { user?: User; updateUser?: any }) => {
       password: isEditForm ? z.string().optional() : z.string(),
       confirmPassword: isEditForm ? z.string().optional() : z.string(),
       role: z.nativeEnum(UserRole),
+      salesPoints: z.array(z.string()).optional(),
     })
-    .superRefine(({ confirmPassword, password }, ctx) => {
+    .superRefine(({ confirmPassword, password, role, salesPoints }, ctx) => {
       if (confirmPassword !== password) {
         ctx.addIssue({
           code: "custom",
@@ -45,16 +77,24 @@ const FormUser = (props: { user?: User; updateUser?: any }) => {
           path: ["confirmPassword"],
         });
       }
+      if (role === UserRole.STAFF && !salesPoints || salesPoints && salesPoints.length < 1) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Se debe elegir al menos un Punto de Venta para el empleado",
+          path: ["salesPoints"],
+        });
+      }
     });
 
   const defaultValues = isEditForm
-    ? props.user
+    ? { ...props.user, salesPoints: selectedSalesPoints }
     : {
         name: "",
         email: "",
         role: UserRole.STAFF,
         password: "",
         confirmPassword: "",
+        salesPoints: [],
       };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -153,7 +193,12 @@ const FormUser = (props: { user?: User; updateUser?: any }) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Rol</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  setShowSalesPoints(value === UserRole.STAFF);
+                }}
+                defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar el rol del usuario a crear" />
@@ -168,6 +213,31 @@ const FormUser = (props: { user?: User; updateUser?: any }) => {
             </FormItem>
           )}
         />
+        { loading && <p>Loading...</p> }
+        {
+          showSalesPoints && (
+            <FormField
+              control={form.control}
+              name="salesPoints"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Seleccionar Puntos de Venta</FormLabel>
+                  <FormControl>
+                    <MultiSelect
+                      options={salesPointsOptions}
+                      onValueChange={setSelectedSalesPoints}
+                      defaultValue={selectedSalesPoints}
+                      placeholder="Seleccionar Puntos de Venta"
+                      variant="inverted"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )
+        }
         <Button type="submit">Enviar</Button>
       </form>
     </Form>
