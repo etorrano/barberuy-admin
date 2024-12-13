@@ -20,6 +20,7 @@ import { SalesPoint } from "@/models/salespoint.model";
 import { deleteSalesPoint } from "@/api/client";
 import { Staff } from "@/models/user.model";
 import { StaffService } from "@/models/service.model";
+import { Workshift } from "@/models/workshift.model";
 
 export default function SalesPointPage() {
   const data: any = useLoaderData();
@@ -74,6 +75,8 @@ export default function SalesPointPage() {
           streetNumber: updatedData.streetNumber,
           floor: updatedData.floor,
           updatedAt: Date.now(),
+          staff: updatedData.staff,
+          workshifts: updatedData.workshifts,
         }
       );
       setSalesPoints(updatedSalesPoints);
@@ -101,6 +104,16 @@ export default function SalesPointPage() {
         cell: ({ getValue }) => {
           const value = getValue();
           return value ? value : "No corresponde";
+        },
+      },
+      {
+        accessorKey: "workshifts",
+        header: "Turnos",
+        cell: ({ getValue }) => {
+          const workshift = getValue() as Workshift[];
+          return workshift?.map((w, index) =>
+            index < workshift.length - 1 ? w.title + ", " : w.title
+          );
         },
       },
       {

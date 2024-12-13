@@ -1,5 +1,6 @@
 import { StaffService } from "./service.model";
 import { Admin, Staff } from "./user.model";
+import { Workshift } from "./workshift.model";
 
 export interface CreateSalesPointPayload {
   name: string;
@@ -21,4 +22,5 @@ export type SalesPoint = {
   admins?: Admin[];
   staff?: Staff[];
   staffServices?: StaffService[];
+  workshifts?: Workshift[];
 };

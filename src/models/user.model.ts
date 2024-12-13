@@ -1,4 +1,5 @@
 import { SalesPoint } from "./salespoint.model";
+import { Workshift } from "./workshift.model";
 
 export enum UserRole {
   SUPERADMIN = "SUPERADMIN",
@@ -13,6 +14,7 @@ export type User = {
   email: string;
   role: UserRole;
   salesPoints?: SalesPoint[];
+  workshifts?: Workshift[];
   createdAt: string;
   updatedAt: string;
 };

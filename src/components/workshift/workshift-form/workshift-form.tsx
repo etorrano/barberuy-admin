@@ -30,6 +30,7 @@ export const daysOptions = [
 ];
 
 const formSchema = z.object({
+  title: z.string(),
   days: z.array(z.nativeEnum(Days)),
   startTime: z.string(),
   endTime: z.string(),
@@ -55,6 +56,7 @@ const WorkshiftForm = (props: {
   const defaultValues = isEditForm
     ? props.workshift
     : {
+        title: "",
         days: selectedDays as Days[],
         startTime: "09:00",
         endTime: "18:00",
@@ -100,6 +102,19 @@ const WorkshiftForm = (props: {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Título</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="days"

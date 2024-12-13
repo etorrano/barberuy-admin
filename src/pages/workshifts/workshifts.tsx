@@ -81,6 +81,10 @@ export default function WorkshiftsPage() {
   const columns: ColumnDef<Workshift>[] = [
     ...([
       {
+        accessorKey: "title",
+        header: "Título",
+      },
+      {
         accessorKey: "days",
         header: "Días",
         cell: ({ getValue }) => {

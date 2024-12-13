@@ -16,6 +16,7 @@ export interface CreateWorkshiftPayload {
 
 export type Workshift = {
   id: string;
+  title: string;
   days: Days[];
   startTime: string;
   endTime: string;

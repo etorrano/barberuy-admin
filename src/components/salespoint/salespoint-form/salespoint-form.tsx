@@ -13,7 +13,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { z } from "@/config/zod/zod-es";
-import { addSalesPoint, editSalesPoint, getStaff } from "@/api/client";
+import {
+  addSalesPoint,
+  editSalesPoint,
+  getStaff,
+  getWorkshifts,
+} from "@/api/client";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
 import { CreateSalesPointPayload, SalesPoint } from "@/models/salespoint.model";
@@ -25,6 +30,7 @@ const formSchema = z.object({
   streetNumber: z.string(),
   floor: z.string().optional(),
   staff: z.array(z.string()),
+  workshifts: z.array(z.string()),
 });
 
 const SalesPointForm = (props: {
@@ -34,7 +40,13 @@ const SalesPointForm = (props: {
   const { toast } = useToast();
   const [isEditForm, setIsEditForm] = useState<boolean>(!!props.salespoint);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
-  const [staffOptions, setStaffOptions] = useState<{ label: string, value: string }[]>([]);
+  const [staffOptions, setStaffOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [selectedWorkshifts, setSelectedWorksifts] = useState<string[]>([]);
+  const [workshiftsOptions, setWorkshiftsOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [loading, setLoading] = useState(true); // Track loading state
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,69 +57,58 @@ const SalesPointForm = (props: {
       streetNumber: "",
       floor: "",
       staff: [],
+      workshifts: [],
     },
   });
 
   useEffect(() => {
-    const fetchStaff = async () => {
+    const fetchStaffAndWorkshifts = async () => {
       try {
         const staffArray = (await getStaff())?.data;
-        console.log("Fetched Staff:", staffArray);
-        setStaffOptions(staffArray?.map((s) => ({ label: s.name, value: s.id.toString() })));
+        const workshiftsArray = (await getWorkshifts())?.data;
+
+        setStaffOptions(
+          staffArray?.map((s) => ({ label: s.name, value: s.id.toString() }))
+        );
+        let selectedStaff: string[] = [];
         if (props.salespoint?.staff) {
-          const selected = props.salespoint.staff.map((s) => s.id.toString());
-          setSelectedStaff(selected);
-          form.reset({
-            ...props.salespoint,
-            staff: selected,
-          });
+          selectedStaff = props.salespoint.staff.map((s) => s.id.toString());
+          setSelectedStaff(selectedStaff);
         }
+
+        setWorkshiftsOptions(
+          workshiftsArray?.map((w) => ({
+            label: w.title,
+            value: w.id.toString(),
+          }))
+        );
+
+        let selectedWorkshifts: string[] = [];
+        if (props.salespoint?.workshifts) {
+          selectedWorkshifts = props.salespoint.workshifts?.map((s) =>
+            s.id.toString()
+          );
+          if (selectedWorkshifts) {
+            setSelectedWorksifts(selectedWorkshifts);
+          }
+        }
+        form.reset({
+          ...props.salespoint,
+          staff: selectedStaff,
+          workshifts: selectedWorkshifts,
+          floor: props.salespoint?.floor || "",
+        });
       } catch (error) {
-        console.error("Failed to fetch staff:", error);
+        console.error("Failed to fetch staff and workshifts:", error);
       } finally {
-        setLoading(false); // Fetch completed
+        setLoading(false);
       }
     };
 
-    fetchStaff();
+    fetchStaffAndWorkshifts();
   }, [props.salespoint, form]);
 
   if (loading) return <p>Loading...</p>;
-  /* useEffect(() => {
-    setSelectedStaff(props?.salespoint?.staff?.map(s => s.id.toString()) || []);
-  }, [props.salespoint]); */
-
-/*   const defaultValues = isEditForm
-    ? { ...props.salespoint, ...{ floor: props?.salespoint?.floor || '',staff: selectedStaff } }
-    : {
-        name: "",
-        street: "",
-        streetNumber: "",
-        floor: "",
-        staff: selectedStaff,
-      };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues,
-  });
-
-  useEffect(() => {
-    if (props.salespoint?.staff) {
-      const selectedStaff = props.salespoint.staff.map((s) => s.id.toString());
-      setSelectedStaff(selectedStaff);
-      form.setValue("staff", props.salespoint.staff.map((s) => s.id.toString())); // Sync form state
-    }
-  }, [props.salespoint, form]);
-
-  useEffect(() => {
-    const fetchStaff = async () => {
-      const staffArray = (await getStaff())?.data;
-      console.log(staffArray)
-      setStaffOptions(staffArray?.map(s => ({ label: s.name, value: s.id.toString() })));
-    };
-    fetchStaff();
-  }, []); */
 
   const handleSalesPointError = () => {
     toast({
@@ -125,7 +126,8 @@ const SalesPointForm = (props: {
     const values: CreateSalesPointPayload = {
       ...formValues,
       ...{ companyId: 1 },
-      ...{ staff: formValues.staff.map(s => ({ id: Number(s)}))},
+      ...{ staff: formValues.staff.map((s) => ({ id: Number(s) })) },
+      ...{ workshifts: selectedWorkshifts.map((s) => ({ id: Number(s) })) },
     };
 
     if (isEditForm) {
@@ -144,7 +146,7 @@ const SalesPointForm = (props: {
           isEditForm ? "editado" : "creado"
         }`,
       });
-      if (isEditForm) props.updateSalesPoint(values);
+      if (isEditForm) props.updateSalesPoint(res.data);
     }
   }
   return (
@@ -222,7 +224,26 @@ const SalesPointForm = (props: {
             </FormItem>
           )}
         />
-
+        <FormField
+          control={form.control}
+          name="workshifts"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Seleccionar turnos de trabajo</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={workshiftsOptions}
+                  onValueChange={setSelectedWorksifts}
+                  defaultValue={selectedWorkshifts}
+                  placeholder="Seleccionar turnos"
+                  variant="inverted"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit">Enviar</Button>
       </form>
     </Form>
